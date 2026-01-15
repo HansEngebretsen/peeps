@@ -23,8 +23,8 @@
         --ui-label: #64748b;
         
         /* Avatar Specs (Dynamic) */
-        --avatar-size: 120px;
-        --label-size: 13px;
+        --avatar-size: 135px;
+        --label-size: 15px;
         --avatar-bg-shape-w: 90%; 
         --avatar-bg-shape-h: 80%;
         --avatar-shadow: none;
@@ -135,13 +135,29 @@
         height: var(--avatar-size);
         position: relative;
         cursor: pointer;
-        transition: width 0.3s ease, height 0.3s ease, transform 0.3s ease, opacity 0.3s ease;
+        transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1), 
+                    height 0.4s cubic-bezier(0.4, 0, 0.2, 1), 
+                    transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), 
+                    opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                    margin 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         animation: wobble 4s ease-in-out infinite;
         filter: var(--avatar-shadow);
         z-index: 5; /* Local z-index for hover states */
+        overflow: visible; /* Allow content to overflow */
+        will-change: width, transform, opacity;
     }
     
-    .img-wrap:active { transform: scale(0.95); } 
+    .img-wrap:active { transform: scale(0.95); }
+    
+    /* New avatar entering animation - starts collapsed */
+    .img-wrap.avatar-entering {
+        width: 0 !important;
+        margin-left: -15px; /* Offset for the gap */
+        margin-right: -15px;
+        opacity: 0;
+        transform: scale(0.3);
+        overflow: hidden;
+    } 
 
     body.animations-paused .img-wrap { animation-play-state: paused !important; }
 
@@ -157,27 +173,96 @@
     body.shape-circle { --avatar-bg-shape-w: 100%; --avatar-bg-shape-h: 100%; }
     body.shape-oval { --avatar-bg-shape-w: 90%; --avatar-bg-shape-h: 80%; }
 
+    /* --- Avatar Image & Masking --- */
+    /* Unified "Pop-out" logic for both Oval and Circle */
+    
+    /* Default Multipliers (Oval) */
+    body { --mask-w-mult: 0.9; --mask-h-mult: 0.8; }
+    
+    /* Circle Overrides */
+    body.shape-circle { --mask-w-mult: 1.0; --mask-h-mult: 1.0; }
+
     .img-wrap img {
-        width: 100%; height: 100%; 
-        border-radius: 50%; /* Default Circle */
-        overflow: hidden; pointer-events: none; position: relative;
+        width: 100%; 
         will-change: transform;
-        object-fit: cover; /* Ensure fill */
+        transform-origin: bottom center;
     }
 
-    /* Oval Mode: Tombstone shape (Round bottom, Square top) to let hair overflow */
-    body.shape-oval .img-wrap img {
-        border-radius: 0 0 50% 50%; 
-        mask-image: linear-gradient(to bottom, black 0%, black 100%); /* Reset mask */
-        transform-origin: bottom center;
-        /* Slight scale up to ensure it covers the oval width fully if needed */
-        transform: scale(1.05); 
-    }
+    /* --- Avatar Image & Masking --- */
     
-    /* Ensure remix animation still works */
-    body.shape-oval .img-wrap img[style*="rotate"] {
-        border-radius: 50%; /* Revert to circle during spin for smoothness */
+    /* Default Multipliers (Oval) */
+    body { --mask-w-mult: 0.9; --mask-h-mult: 0.8; }
+
+    .img-wrap img {
+        width: 100%; 
+        will-change: transform;
+        transform-origin: bottom center;
+        
+        height: auto; /* Natural height for hair overflow */
+        min-height: 100%;
+        position: absolute;
+        bottom: 0; 
+        left: 0;
+        border-radius: 0; 
+        object-fit: cover;
     }
+
+    /* 1. Oval Mode: Robust Tombstone Mask (Verified Working) */
+    body.shape-oval .img-wrap img {
+        /* 
+         * Robust Tombstone Mask:
+         * 1. Bottom: Ellipse matching the background shape.
+         * 2. Top: Rectangle extending up from the ellipse's equator.
+         */
+        --mask-w: calc(var(--avatar-size) * var(--mask-w-mult));
+        --mask-h: calc(var(--avatar-size) * var(--mask-h-mult));
+        --mask-eq: calc(var(--mask-h) / 2);
+
+        mask-image: 
+            /* Bottom Ellipse */
+            radial-gradient(ellipse closest-side, black 99%, transparent 100%),
+            /* Top Rect (starts at equator) */
+            linear-gradient(to top, transparent calc(var(--mask-eq) - 1px), black var(--mask-eq));
+            
+        mask-size: 
+            var(--mask-w) var(--mask-h),    /* Ellipse: w x h */
+            100% 500%;                      /* Rect: 100% wide for side hair */
+            
+        mask-position: 
+            bottom center,
+            bottom center; 
+
+        mask-repeat: no-repeat;
+        mask-composite: add;
+        
+        /* Webkit Prefixes */
+        -webkit-mask-image: 
+            radial-gradient(ellipse closest-side, black 99%, transparent 100%),
+            linear-gradient(to top, transparent calc(var(--mask-eq) - 1px), black var(--mask-eq));
+        -webkit-mask-size: 
+            var(--mask-w) var(--mask-h),
+            100% 500%;
+        -webkit-mask-position: 
+            bottom center,
+            bottom center;
+        -webkit-mask-repeat: no-repeat;
+        -webkit-mask-composite: source-over;
+    }
+
+    /* 2. Circle Mode: Simple Border Radius (Robust Fallback) */
+    body.shape-circle .img-wrap img {
+        mask-image: none;
+        -webkit-mask-image: none;
+        /* 
+         * Use border-radius for the bottom curve.
+         * Top is 0 (square/open) to allow hair overflow.
+         * Bottom radius is exactly half the container width (67.5px).
+         */
+        --r: calc(var(--avatar-size) / 2);
+        border-radius: 0 0 var(--r) var(--r);
+    }
+
+
 
     /* Label - Scalable to Font Size */
     .role-label {
@@ -204,8 +289,7 @@
         white-space: normal;
         text-align: center;
         line-height: 1.1;
-        width: auto;
-        min-width: 4.6em; 
+        width: auto; 
         max-width: 10.7em; 
         max-height: 2.4em; 
         overflow: hidden;
@@ -251,10 +335,16 @@
     .add-card {
         width: var(--avatar-size); height: var(--avatar-size); border-radius: 50%;
         display: flex; align-items: center; justify-content: center;
-        cursor: pointer; transition: 0.2s; 
+        cursor: pointer; 
+        transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                    opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                    width 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                    height 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                    margin 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         color: #fff; mix-blend-mode: difference;
         position: relative;
         z-index: 5;
+        will-change: transform;
     }
     .add-card::after {
         content: ''; position: absolute;
@@ -562,28 +652,41 @@
     addCard.innerHTML = `<span class="material-symbols-outlined">add</span>`;
     addCard.onclick = () => {
         const av = createAvatar({ role: rnd(CONFIG.common.roles), id: rndId() }, grid.children.length - 1);
-        grid.insertBefore(av, addCard);
-        av.animate([{transform:'scale(0)'}, {transform:'scale(1)'}], {duration:300});
         
-        setTimeout(() => {
-            const label = av.querySelector('.role-label');
-            if(label) {
-                label.focus();
-                const range = document.createRange();
-                range.selectNodeContents(label);
-                const sel = window.getSelection();
-                sel.removeAllRanges();
-                sel.addRange(range);
-            }
-        }, 350);
+        // Start with collapsed state for smooth entry
+        av.classList.add('avatar-entering');
+        grid.insertBefore(av, addCard);
+        
+        // Force reflow, then remove the entering class to trigger CSS transition
+        void av.offsetWidth;
+        
+        // Use requestAnimationFrame for smooth 60fps animation
+        requestAnimationFrame(() => {
+            av.classList.remove('avatar-entering');
+            
+            // Focus the label after animation completes
+            setTimeout(() => {
+                const label = av.querySelector('.role-label');
+                if(label) {
+                    label.focus();
+                    const range = document.createRange();
+                    range.selectNodeContents(label);
+                    const sel = window.getSelection();
+                    sel.removeAllRanges();
+                    sel.addRange(range);
+                }
+            }, 400);
+        });
     };
 
     function getAvatarSrc(id, isParty) {
         const mode = isParty ? 'party' : 'business';
-        if (typeof id === 'string') {
-            return `assets/roster/${id}_${mode}.svg`;
+        // If it's a number OR a string that is a number, it's a random avatar
+        if (typeof id === 'number' || (typeof id === 'string' && !isNaN(id) && !isNaN(parseFloat(id)))) {
+            return `assets/random_${mode}/avatar_${id}.svg`;
         }
-        return `assets/random_${mode}/avatar_${id}.svg`;
+        // Otherwise it's a roster ID (string like 'CISO')
+        return `assets/roster/${id}_${mode}.svg`;
     }
 
     function createAvatar(data, index) {
@@ -680,29 +783,43 @@
 
         // Buttons
         wrap.querySelector('.btn-del').onclick = (e) => { 
-            e.stopPropagation(); 
-            wrap.style.transition = 'all 0.3s ease';
-            wrap.style.transform='scale(0)'; 
+            e.stopPropagation();
+            
+            // Smooth 60fps delete: collapse width to prevent layout jump
+            wrap.style.transform = 'scale(0.3)';
             wrap.style.opacity = '0';
-            setTimeout(()=>wrap.remove(),300); 
+            wrap.style.width = '0';
+            wrap.style.marginLeft = '-15px';
+            wrap.style.marginRight = '-15px';
+            wrap.style.overflow = 'hidden';
+            
+            // Remove after transition completes
+            setTimeout(() => wrap.remove(), 400);
         };
         
         wrap.querySelector('.btn-remix').onclick = (e) => {
             e.stopPropagation();
-            const newId = rndId();
-            wrap.dataset.id = newId;
-            updateImage(wrap);
-            
             const img = wrap.querySelector('img');
-            img.style.transition = 'transform 0.5s ease';
-            img.style.transform = 'rotate(360deg)';
+            
+            // Subtle Fade/Scale Animation
+            img.style.transition = 'all 0.15s ease-out';
+            img.style.opacity = '0';
+            img.style.transform = 'scale(0.9) translateY(5px)';
             
             setTimeout(() => {
+                const newId = rndId();
+                wrap.dataset.id = newId;
+                updateImage(wrap);
+                
+                // Entry animation
                 img.style.transition = 'none';
-                img.style.transform = 'rotate(0deg)';
-                void img.offsetWidth;
-                img.style.transition = 'transform 0.5s ease';
-            }, 250);
+                img.style.transform = 'scale(0.9) translateY(-5px)';
+                void img.offsetWidth; // Force reflow
+                
+                img.style.transition = 'all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+                img.style.opacity = '1';
+                img.style.transform = 'scale(1) translateY(0)';
+            }, 150);
         };
 
         wrap.querySelector('.btn-color').onclick = (e) => {
