@@ -1,1320 +1,219 @@
 <!DOCTYPE html>
-<html lang="en"><head>
+<html lang="en">
+<head>
 <meta charset="utf-8">
 <meta content="width=device-width, initial-scale=1.0" name="viewport">
 <title>Security Avatars: Studio Edition</title>
-<!-- Google Material Symbols -->
+<!-- Google Material Symbols & Pixel Font -->
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
-<style>
-    :root {
-        --font-family: "Google Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-        
-        /* Theme Variables */
-        --bg-color: #ffffff;
-        
-        /* UI Colors */
-        --ui-panel-bg: rgba(255, 255, 255, 0.95);
-        --ui-border: #e2e8f0;
-        --ui-text: #1e293b;
-        --ui-icon: #64748b;
-        --ui-active-bg: #ffffff;
-        --ui-active-text: #0f172a;
-        --ui-accent: #3b82f6;
-        --ui-label: #64748b;
-        
-        /* Avatar Specs (Dynamic) */
-        --avatar-size: 135px;
-        --label-size: 15px;
-        --avatar-bg-shape-w: 90%; 
-        --avatar-bg-shape-h: 80%;
-        --avatar-shadow: none;
-        
-        /* Shadows */
-        --shadow-dark-preset: 
-            drop-shadow(0px -3px 2px rgba(214, 229, 255, 0.1)) 
-            drop-shadow(0px -4px 12px rgba(214, 229, 255, 0.1)) 
-            drop-shadow(0px -1px 0px rgba(214, 229, 255, 0.1)) 
-            drop-shadow(0px -1px 0px rgba(214, 229, 255, 0.1));
-    }
-
-    body {
-        font-family: var(--font-family);
-        background-color: var(--bg-color);
-        color: var(--ui-text);
-        margin: 0; padding: 0;
-        min-height: 100vh;
-        display: flex; flex-direction: column;
-        overflow-x: hidden;
-        user-select: none;
-        transition: background-color 0.4s ease, color 0.4s ease;
-    }
-
-    /* Dark Mode Class Override */
-    body.dark-mode {
-        --ui-panel-bg: var(--dark-panel);
-        --ui-border: var(--dark-border);
-        --ui-text: var(--dark-text);
-        --ui-icon: var(--dark-icon);
-        --ui-active-bg: var(--dark-active-bg);
-        --ui-active-text: #fff;
-        --ui-label: var(--dark-label);
-    }
-
-    /* Performance optimization class */
-    body.sliding-active .img-wrap,
-    body.sliding-active .role-label,
-    body.sliding-active .img-wrap::before {
-        transition: none !important;
-    }
-
-    /* Common Icon Style */
-    .material-symbols-outlined {
-        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-        font-size: 20px;
-        pointer-events: none;
-    }
-    .active .material-symbols-outlined, .icon-btn:hover .material-symbols-outlined {
-        font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-    }
-
-    /* Confetti Canvas */
-    #confetti-canvas {
-        position: fixed;
-        top: 0; left: 0; width: 100%; height: 100%;
-        pointer-events: none;
-        z-index: 1;
-        opacity: 0;
-        transition: opacity 0.5s ease;
-    }
-    body.party-active #confetti-canvas { opacity: 1; }
-
-    /* --- Top Controls --- */
-    .site-title {
-        position: fixed; top: 20px; left: 30px;
-        margin: 0; font-size: 24px; font-weight: 700;
-        z-index: 100; cursor: text;
-        color: #fff; mix-blend-mode: difference;
-        text-transform: uppercase; letter-spacing: -0.02em;
-    }
-    .site-title:focus { outline: none; border-bottom: 2px solid white; }
-
-    .top-bar {
-        position: fixed; top: 20px; right: 30px;
-        display: flex; gap: 8px; z-index: 100;
-        color: #fff; mix-blend-mode: difference;
-    }
-    
-    .top-bar .icon-btn {
-        width: 40px; height: 40px;
-        border-radius: 50%;
-        background: transparent;
-        border: none;
-        display: flex; align-items: center; justify-content: center;
-        cursor: pointer;
-        color: inherit;
-        transition: transform 0.2s;
-    }
-    .top-bar .icon-btn:hover { transform: scale(1.1); }
-    /* Active state relies on opacity/scale since color is locked to white/diff */
-    .top-bar .icon-btn.active { opacity: 0.7; transform: scale(0.95); } 
-    .top-bar .icon-btn#partyBtn.active { opacity: 1; transform: scale(1.1); } 
-    .top-bar .icon-btn svg { width: 26px; height: 26px; stroke-width: 2; }
-
-    /* --- Grid --- */
-    .imgs {
-        display: flex; flex-wrap: wrap; gap: 30px;
-        justify-content: center;
-        padding: 100px 40px 180px;
-        max-width: 1400px; margin: 0 auto;
-        position: relative; /* z-index removed to allow blending */
-    }
-
-    /* --- Avatar Component --- */
-    .img-wrap {
-        width: var(--avatar-size); 
-        height: var(--avatar-size);
-        position: relative;
-        cursor: pointer;
-        transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1), 
-                    height 0.4s cubic-bezier(0.4, 0, 0.2, 1), 
-                    transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), 
-                    opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1),
-                    margin 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        animation: wobble 4s ease-in-out infinite;
-        filter: var(--avatar-shadow);
-        z-index: 5; /* Local z-index for hover states */
-        overflow: visible; /* Allow content to overflow */
-        will-change: width, transform, opacity;
-    }
-    
-    .img-wrap:active { transform: scale(0.95); }
-    
-    /* New avatar entering animation - starts collapsed */
-    .img-wrap.avatar-entering {
-        width: 0 !important;
-        margin-left: -15px; /* Offset for the gap */
-        margin-right: -15px;
-        opacity: 0;
-        transform: scale(0.3);
-        overflow: hidden;
-    } 
-
-    body.animations-paused .img-wrap { animation-play-state: paused !important; }
-
-    .img-wrap::before {
-        content: ""; z-index: -1; position: absolute;
-        border-radius: 100%; left: 50%; transform: translateX(-50%);
-        background-color: var(--avatar-bg);
-        transition: background-color 0.3s ease, width 0.3s ease, height 0.3s ease;
-        width: var(--avatar-bg-shape-w); height: var(--avatar-bg-shape-h);
-        bottom: 0;
-    }
-
-    body.shape-circle { --avatar-bg-shape-w: 100%; --avatar-bg-shape-h: 100%; }
-    body.shape-oval { --avatar-bg-shape-w: 90%; --avatar-bg-shape-h: 80%; }
-
-    /* --- Avatar Image & Masking --- */
-    /* Unified "Pop-out" logic for both Oval and Circle */
-    
-    /* Default Multipliers (Oval) */
-    body { --mask-w-mult: 0.9; --mask-h-mult: 0.8; }
-    
-    /* Circle Overrides */
-    body.shape-circle { --mask-w-mult: 1.0; --mask-h-mult: 1.0; }
-
-    .img-wrap img {
-        width: 100%; 
-        will-change: transform;
-        transform-origin: bottom center;
-    }
-
-    /* --- Avatar Image & Masking --- */
-    
-    /* Default Multipliers (Oval) */
-    body { --mask-w-mult: 0.9; --mask-h-mult: 0.8; }
-
-    .img-wrap img {
-        width: 100%; 
-        will-change: transform;
-        transform-origin: bottom center;
-        
-        height: auto; /* Natural height for hair overflow */
-        min-height: 100%;
-        position: absolute;
-        bottom: 0; 
-        left: 0;
-        border-radius: 0; 
-        object-fit: cover;
-    }
-
-    /* 1. Oval Mode: Robust Tombstone Mask (Verified Working) */
-    body.shape-oval .img-wrap img {
-        /* 
-         * Robust Tombstone Mask:
-         * 1. Bottom: Ellipse matching the background shape.
-         * 2. Top: Rectangle extending up from the ellipse's equator.
-         */
-        --mask-w: calc(var(--avatar-size) * var(--mask-w-mult));
-        --mask-h: calc(var(--avatar-size) * var(--mask-h-mult));
-        --mask-eq: calc(var(--mask-h) / 2);
-
-        mask-image: 
-            /* Bottom Ellipse */
-            radial-gradient(ellipse closest-side, black 99%, transparent 100%),
-            /* Top Rect (starts at equator) */
-            linear-gradient(to top, transparent calc(var(--mask-eq) - 1px), black var(--mask-eq));
-            
-        mask-size: 
-            var(--mask-w) var(--mask-h),    /* Ellipse: w x h */
-            100% 500%;                      /* Rect: 100% wide for side hair */
-            
-        mask-position: 
-            bottom center,
-            bottom center; 
-
-        mask-repeat: no-repeat;
-        mask-composite: add;
-        
-        /* Webkit Prefixes */
-        -webkit-mask-image: 
-            radial-gradient(ellipse closest-side, black 99%, transparent 100%),
-            linear-gradient(to top, transparent calc(var(--mask-eq) - 1px), black var(--mask-eq));
-        -webkit-mask-size: 
-            var(--mask-w) var(--mask-h),
-            100% 500%;
-        -webkit-mask-position: 
-            bottom center,
-            bottom center;
-        -webkit-mask-repeat: no-repeat;
-        -webkit-mask-composite: source-over;
-    }
-
-    /* 2. Circle Mode: Simple Border Radius (Robust Fallback) */
-    body.shape-circle .img-wrap img {
-        mask-image: none;
-        -webkit-mask-image: none;
-        /* 
-         * Use border-radius for the bottom curve.
-         * Top is 0 (square/open) to allow hair overflow.
-         * Bottom radius is exactly half the container width (67.5px).
-         */
-        --r: calc(var(--avatar-size) / 2);
-        border-radius: 0 0 var(--r) var(--r);
-    }
-
-
-
-    /* Label - Scalable to Font Size */
-    .role-label {
-        background-color: var(--avatar-bg);
-        color: rgba(0, 0, 0, 0.6);
-        font-weight: bold;
-        box-shadow: 0 0.08em 0.15em 0.08em rgba(0, 0, 0, 0.14);
-        border: 0.08em solid rgba(255, 255, 255, 0.5);
-        font-size: var(--label-size); 
-        text-transform: uppercase;
-        letter-spacing: 0.1em;
-        
-        position: absolute;
-        bottom: 6px;
-        left: 50%;
-        display: block;
-        padding: 0.15em 0.46em;
-        border-radius: 0.3em;
-        z-index: 12;
-        transform: translateX(-50%);
-        transition: 300ms 400ms all;
-        
-        cursor: text;
-        white-space: normal;
-        text-align: center;
-        line-height: 1.1;
-        width: auto; 
-        max-width: 10.7em; 
-        max-height: 2.4em; 
-        overflow: hidden;
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
-        text-overflow: ellipsis;
-    }
-    
-    .role-label:focus {
-        max-height: none; z-index: 20; background: white; overflow: visible; -webkit-line-clamp: unset;
-    }
-    
-    body.hide-labels .role-label { opacity: 0; pointer-events: none; }
-
-    /* --- Action Buttons --- */
-    .action-container {
-        position: absolute; top: 0px; right: -45px;
-        width: 45px; height: 100%;
-        display: flex; flex-direction: column; justify-content: center; gap: 8px;
-        opacity: 0; pointer-events: none; transition: opacity 0.2s;
-        z-index: 20;
-        /* Removed blend mode here, handling in button */
-    }
-    
-    body:not(.view-mode) .img-wrap:hover .action-container,
-    .action-container:hover { opacity: 1; pointer-events: auto; }
-
-    .mini-btn {
-        width: 32px; height: 32px; border-radius: 50%;
-        background: #222; /* High contrast solid bg */
-        border: 1px solid rgba(255,255,255,0.3);
-        display: flex; align-items: center; justify-content: center;
-        cursor: pointer; color: #fff; /* Always white icon */
-        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-        transition: transform 0.2s, opacity 0.2s;
-        position: relative;
-    }
-    .mini-btn:hover { transform: scale(1.15); opacity: 1; z-index: 25; background: #000; border-color: #fff; }
-    .mini-btn .material-symbols-outlined { font-size: 18px; color: inherit; }
-
-    /* --- Add Card --- */
-    .add-card {
-        width: var(--avatar-size); height: var(--avatar-size); border-radius: 50%;
-        display: flex; align-items: center; justify-content: center;
-        cursor: pointer; 
-        transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1),
-                    opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1),
-                    width 0.4s cubic-bezier(0.4, 0, 0.2, 1),
-                    height 0.4s cubic-bezier(0.4, 0, 0.2, 1),
-                    margin 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        color: #fff; mix-blend-mode: difference;
-        position: relative;
-        z-index: 5;
-        will-change: transform;
-    }
-    .add-card::after {
-        content: ''; position: absolute;
-        border: 2px dashed currentColor;
-        left: 50%; top: 50%; transform: translate(-50%, -50%);
-        width: var(--avatar-bg-shape-w); height: var(--avatar-bg-shape-h);
-        border-radius: 100%; transition: all 0.3s ease; pointer-events: none;
-    }
-    .add-card:hover { opacity: 1; transform: scale(1.05); }
-    .add-card .material-symbols-outlined { font-size: 32px; color: inherit; }
-    body.view-mode .add-card { display: none; }
-
-    /* --- Footer Info --- */
-    .footer-info {
-        position: fixed; bottom: 90px; left: 0; right: 0;
-        text-align: center; pointer-events: none;
-        z-index: 80; opacity: 0.8; color: #fff; mix-blend-mode: difference;
-        font-size: 13px; font-weight: 500;
-        display: flex; justify-content: center; gap: 8px; align-items: center;
-        padding-bottom: 15px;
-    }
-    body.view-mode .footer-info { display: none; }
-    
-    .footer-sep { opacity: 0.4; margin: 0 4px; }
-    
-    .dl-link {
-        pointer-events: auto; cursor: pointer;
-        text-decoration: none; color: inherit;
-        border-bottom: 1px solid currentColor;
-        transition: all 0.2s;
-    }
-    .dl-link:hover { opacity: 0.7; }
-
-    /* --- Bottom Bar --- */
-    .bottom-bar {
-        position: fixed; bottom: 0; left: 0; right: 0;
-        background: transparent;
-        padding: 16px 24px;
-        display: flex; justify-content: center; align-items: center; gap: 32px;
-        z-index: 90; backdrop-filter: blur(12px);
-        color: #fff; mix-blend-mode: difference;
-    }
-    body.view-mode .bottom-bar { display: none; }
-
-    .control-group {
-        display: flex; align-items: center; gap: 12px;
-    }
-    .group-label {
-        font-size: 11px; font-weight: 700; text-transform: uppercase; 
-        color: inherit; letter-spacing: 0.05em; min-width: 30px;
-    }
-
-    /* Segmented Control */
-    .segmented-control {
-        background: rgba(255,255,255,0.1);
-        border-radius: 8px; padding: 3px; display: flex; gap: 2px;
-    }
-    
-    .segment-opt {
-        padding: 6px 12px;
-        cursor: pointer; border-radius: 6px; color: inherit; opacity: 0.5;
-        transition: all 0.2s; display: flex; align-items: center; justify-content: center;
-    }
-    .segment-opt.active {
-        background: rgba(255,255,255,0.2); opacity: 1;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    }
-
-    /* Range Slider */
-    .slider-control {
-        display: flex; align-items: center; width: 120px;
-    }
-    input[type=range] {
-        -webkit-appearance: none; width: 100%; background: transparent; cursor: ew-resize;
-    }
-    input[type=range]::-webkit-slider-thumb {
-        -webkit-appearance: none; height: 14px; width: 14px;
-        border-radius: 50%; background: #fff;
-        cursor: ew-resize;
-        margin-top: -5px; box-shadow: 0 1px 3px rgba(0,0,0,0.3);
-    }
-    input[type=range]::-webkit-slider-runnable-track {
-        width: 100%; height: 4px; cursor: ew-resize;
-        background: rgba(255,255,255,0.2); border-radius: 2px;
-    }
-
-    /* Animation Pause Button */
-    .anim-btn {
-        width: 36px; height: 36px;
-        border: 2px solid currentColor;
-        border-radius: 50%;
-        background: transparent;
-        color: inherit;
-        cursor: pointer;
-        display: flex; align-items: center; justify-content: center;
-        transition: all 0.2s;
-    }
-    .anim-btn:hover { opacity: 0.7; background: rgba(255,255,255,0.05); }
-    .anim-btn.paused { opacity: 1; border-width: 3px; }
-
-    /* Settings Button */
-    .settings-btn {
-        background: none; border: none; cursor: pointer;
-        color: inherit; padding: 8px; border-radius: 6px;
-        transition: 0.2s; display: flex; align-items: center;
-    }
-    .settings-btn.active { background: rgba(255,255,255,0.1); }
-
-    /* Popovers */
-    .popover {
-        position: fixed; /* Changed from absolute */
-        background: rgba(15, 23, 42, 0.95); /* Solid dark background */
-        border: 1px solid rgba(255,255,255,0.2);
-        border-radius: 12px; padding: 16px;
-        box-shadow: 0 10px 40px rgba(0,0,0,0.5);
-        opacity: 0; pointer-events: none; transform: translateY(10px);
-        transition: all 0.2s; backdrop-filter: blur(12px);
-        z-index: 200; /* Higher than bottom-bar */
-        color: #fff; 
-    }
-    .popover.active { opacity: 1; pointer-events: auto; transform: translateY(0); }
-
-    .settings-popover { width: 240px; }
-
-    .setting-row {
-        display: flex; justify-content: space-between; align-items: center;
-        margin-bottom: 14px; font-size: 12px; font-weight: 600; color: inherit;
-    }
-    .setting-row span { color: inherit; }
-    .setting-row:last-child { margin-bottom: 0; }
-    
-    select, input[type="text"], input[type="password"] {
-        background: transparent; color: inherit;
-        border: 1px solid currentColor; border-radius: 4px;
-        padding: 4px 8px; font-size: 12px; outline: none;
-    }
-    input[type="text"] { width: 100%; margin-bottom: 10px; }
-    
-    .switch {
-        width: 32px; height: 18px; background: #5d5d5d; border-radius: 18px; position: relative; cursor: pointer;
-    }
-    .switch::after { content:''; position: absolute; top: 2px; left: 2px; width: 14px; height: 14px; background: white; border-radius: 50%; transition: 0.3s; }
-    .switch.on { background: var(--ui-accent); }
-    .switch.on::after { left: 16px; }
-
-    input[type="color"] { width: 20px; height: 20px; border: none; padding: 0; background: none; cursor: pointer; border-radius: 50%; }
-
-    /* Animation */
-    @keyframes wobble {
-        0%, 100% { transform: translateX(0%); }
-        15% { transform: translateX(-1%) translateY(-1%); }
-        30% { transform: translateX(1%) translateY(-1%); }
-        45% { transform: translateX(1%) translateY(1%); }
-        60% { transform: translateX(-1%) translateY(1%); }
-        75% { transform: translateX(1%) translateY(0); }
-        90% { transform: translateX(-1%) translateY(0); }
-    }
-    @keyframes party-bounce {
-        0%, 100% { transform: translateY(0) rotate(-3deg); }
-        50% { transform: translateY(-10px) rotate(3deg); }
-    }
-    body.party-active .img-wrap { animation: party-bounce 0.5s infinite alternate; }
-
-    .toast {
-        position: fixed; bottom: 120px; left: 50%; transform: translateX(-50%);
-        background: rgba(0,0,0,0.9); color: white; padding: 10px 24px; border-radius: 30px;
-        font-size: 14px; font-weight: 600; opacity: 0; pointer-events: none; transition: opacity 0.3s; z-index: 9999;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-    }
-</style>
+<link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+<link href="css/styles.css" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
 </head>
-<body class="shape-oval">
-<canvas id="confetti-canvas" width="1238" height="623"></canvas>
+<body class="shape-oval" data-theme="clean" data-view="full">
+<canvas id="confetti-canvas"></canvas>
+
 <h1 id="siteTitle" contenteditable="true" class="site-title">Personas</h1>
+
+<!-- AI loading overlay -->
+<div id="loading-msg">
+    <span class="material-symbols-outlined loader-icon">auto_awesome</span>
+    <div class="loader-text">Making peeps...</div>
+    <div class="loader-sub">should take a few more seconds</div>
+</div>
+
 <!-- Top Controls -->
 <div class="top-bar">
-<button class="icon-btn" id="shareBtn" title="Share Configuration">
-<span class="material-symbols-outlined">ios_share</span>
-</button>
-<button class="icon-btn" id="partyBtn" title="Business/Party Mode">
-<span class="material-symbols-outlined briefcase-icon" style="display: block;">work</span>
-<span class="material-symbols-outlined party-icon" style="display: none;">celebration</span>
-</button>
-<button class="icon-btn" id="viewBtn" title="View/Edit Mode">
-<span class="material-symbols-outlined">visibility</span>
-</button>
+    <button class="icon-btn" id="generateBtn" title="Generate AI Personas">
+        <span class="material-symbols-outlined">auto_awesome</span>
+    </button>
+    <button class="icon-btn" id="shareBtn" title="Share Configuration">
+        <span class="material-symbols-outlined">ios_share</span>
+    </button>
+    <button class="icon-btn" id="partyBtn" title="Business/Party Mode">
+        <span class="material-symbols-outlined briefcase-icon">work</span>
+        <span class="material-symbols-outlined party-icon" style="display:none;">celebration</span>
+    </button>
+    <button class="icon-btn" id="viewBtn" title="View/Edit Mode">
+        <span class="material-symbols-outlined">visibility</span>
+    </button>
+    <button class="icon-btn" id="themeBtn" title="Dark Mode">
+        <span class="material-symbols-outlined" id="themeIcon">dark_mode</span>
+    </button>
 </div>
-<!-- Grid -->
+
+<!-- AI Generation Popover -->
+<div class="popover generator-popover" id="generatePanel">
+    <div class="gen-key-row" id="genKeyRow">
+        <label class="gen-label" for="genApiKey">Gemini API key</label>
+        <input id="genApiKey" placeholder="Paste key (stored in this browser)" type="password" autocomplete="off">
+        <p class="gen-key-hint">Needed once. Get one at <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">aistudio.google.com</a>.</p>
+    </div>
+    <label class="gen-label" for="genTopic">Describe your peeps</label>
+    <input id="genTopic" placeholder="e.g. Healthcare, Fintech, Cyber" type="text">
+    <div class="input-group-row">
+        <span class="slider-label">Amount</span>
+        <input id="genCountRange" max="20" min="1" type="range" value="6">
+        <span class="count-val" id="genCountDisplay">6</span>
+    </div>
+    <button class="gen-btn" id="submitGenBtn">Make peeps</button>
+    <span class="gen-key-reset hidden" id="genKeyReset">Change API key</span>
+</div>
+
+<!-- Grid (populated by js/app.js) -->
 <div class="imgs" id="grid"></div>
+
 <!-- Footer Info -->
 <div class="footer-info">
-<span>Click avatar to copy</span>
-<span class="footer-sep">•</span>
-<span>Press Space to pause</span>
-<span class="footer-sep">•</span>
-<span class="dl-link" id="downloadAllBtn">Download All</span>
+    <span>Click Copy Icon or Image</span>
+    <span class="footer-sep">•</span>
+    <span>Press Space to pause</span>
+    <span class="footer-sep">•</span>
+    <span class="dl-link" id="downloadAllBtn">Download All</span>
 </div>
+
 <!-- Bottom Bar -->
 <div class="bottom-bar">
-<!-- Shape Group -->
-<div class="control-group">
-<span class="group-label">View</span>
-<div class="segmented-control" id="shapeControl">
-<div class="segment-opt active" data-val="oval" title="Oval"><span class="material-symbols-outlined">egg</span></div>
-<div class="segment-opt" data-val="circle" title="Circle"><span class="material-symbols-outlined">circle</span></div>
-</div>
-<div class="slider-control" title="Avatar Size">
-<input id="sizeSlider" max="250" min="80" type="range" value="120">
-</div>
-</div>
-<!-- Theme Group -->
-<div class="control-group">
-<span class="group-label">Theme</span>
-<div class="segmented-control" id="themeControl">
-<div class="segment-opt active" data-val="light" title="Light Mode"><span class="material-symbols-outlined">light_mode</span></div>
-<div class="segment-opt" data-val="dark" title="Dark Mode"><span class="material-symbols-outlined">dark_mode</span></div>
-</div>
-</div>
-<!-- Label Group -->
-<div class="control-group">
-<span class="group-label">Label</span>
-<div class="segmented-control" id="labelControl">
-<div class="segment-opt active" data-val="show" title="Show Label"><span class="material-symbols-outlined">visibility</span></div>
-<div class="segment-opt" data-val="hide" title="Hide Label"><span class="material-symbols-outlined">visibility_off</span></div>
-</div>
-<div class="slider-control" title="Font Size">
-<input id="fontSlider" max="30" min="10" type="range" value="13">
-</div>
-</div>
-<!-- Animation Toggle Group -->
-<div class="control-group">
-<span class="group-label">Anim</span>
-<button class="anim-btn" id="pauseBtn" title="Play/Pause (Space)">
-<span class="material-symbols-outlined" id="pauseIcon">pause</span>
-</button>
-</div>
-<!-- Settings Trigger Container -->
-<button class="settings-btn" id="settingsBtn" title="Settings">
-<span class="material-symbols-outlined">settings</span>
-</button>
-</div>
-<!-- Settings Popover (Moved out to escape blend mode) -->
-<div class="popover settings-popover" id="settingsPanel">
-<div class="setting-row">
-<span>Copy Format</span>
-<select id="copyFormatSelect">
-<option selected="" value="png">PNG (Image)</option>
-<option value="svg">SVG (Code)</option>
-</select>
-</div>
-<div class="setting-row">
-<span>Background Color</span>
-<input id="bgColorPicker" type="color" value="#ffffff">
-</div>
-<div class="setting-row">
-<span>Drop Shadows</span>
-<div class="switch" id="shadowToggle"></div>
-</div>
-<div class="setting-row">
-<span>Shadow Color</span>
-<input id="shadowColorPicker" type="color" value="#000000">
-</div>
-</div>
-<div class="toast" id="toast" style="opacity: 0;">Edit Mode</div>
-<script>
-    // --- Configuration ---
-    const AVATAR_COUNT = 60;
-    
-    const CONFIG = {
-        common: {
-            roles: ['CISO', 'Engineer', 'Hunter', 'Analyst', 'Admin', 'Architect', 'Forensics', 'IR', 'Manager']
-        },
-        bgColors: ['#4da667', '#f6cf64', '#a9accd', '#e0e0e0']
-    };
-
-    const INITIAL_ROSTER = [
-        { role: "CISO", id: "CISO" },
-        { role: "Engineer", id: "Engineer" },
-        { role: "Hunter", id: "Hunter" },
-        { role: "Investigator", id: "Investigator" },
-        { role: "Manager", id: "Manager" },
-        { role: "Analyst", id: "Analyst_Sr" },
-        { role: "Developer", id: "Developer" },
-        { role: "Admin", id: "Admin" },
-        { role: "Analyst", id: "Analyst_Jr" },
-        { role: "Architect", id: "Architect" },
-        { role: "Forensics", id: "Forensics" },
-        { role: "IR", id: "IR" }
-    ];
-
-    const state = {
-        partyMode: false, viewMode: false, darkMode: false, shadows: false, 
-        copyFormat: 'png', dragEl: null, isPaused: false
-    };
-
-    const rnd = (arr) => arr[Math.floor(Math.random() * arr.length)];
-    const rndId = () => Math.floor(Math.random() * AVATAR_COUNT);
-
-    // --- DOM Gen ---
-    const grid = document.getElementById('grid');
-    const addCard = document.createElement('div');
-    addCard.className = 'add-card';
-    addCard.innerHTML = `<span class="material-symbols-outlined">add</span>`;
-    addCard.onclick = () => {
-        const av = createAvatar({ role: rnd(CONFIG.common.roles), id: rndId() }, grid.children.length - 1);
-        
-        // Start with collapsed state for smooth entry
-        av.classList.add('avatar-entering');
-        grid.insertBefore(av, addCard);
-        
-        // Force reflow, then remove the entering class to trigger CSS transition
-        void av.offsetWidth;
-        
-        // Use requestAnimationFrame for smooth 60fps animation
-        requestAnimationFrame(() => {
-            av.classList.remove('avatar-entering');
-            
-            // Focus the label after animation completes
-            setTimeout(() => {
-                const label = av.querySelector('.role-label');
-                if(label) {
-                    label.focus();
-                    const range = document.createRange();
-                    range.selectNodeContents(label);
-                    const sel = window.getSelection();
-                    sel.removeAllRanges();
-                    sel.addRange(range);
-                }
-            }, 400);
-        });
-    };
-
-    function getAvatarSrc(id, isParty) {
-        const mode = isParty ? 'party' : 'business';
-        // If it's a number OR a string that is a number, it's a random avatar
-        if (typeof id === 'number' || (typeof id === 'string' && !isNaN(id) && !isNaN(parseFloat(id)))) {
-            return `assets/random_${mode}/avatar_${id}.svg`;
-        }
-        // Otherwise it's a roster ID (string like 'CISO')
-        return `assets/roster/${id}_${mode}.svg`;
-    }
-
-    function createAvatar(data, index) {
-        // Data: { role, id, bg }
-        let role = data.role || "Role";
-        let id = data.id !== undefined ? data.id : rndId();
-        
-        // Validation: if numeric ID is out of bounds, reset
-        if (typeof id === 'number' && id >= AVATAR_COUNT) id = 0;
-
-        let bgColor = data.bg;
-        const color = bgColor ? bgColor : CONFIG.bgColors[index % CONFIG.bgColors.length];
-        
-        const wrap = document.createElement('div');
-        wrap.className = 'img-wrap';
-        wrap.draggable = true;
-        wrap.style.setProperty('--avatar-bg', color);
-        wrap.style.animationDelay = (index * 0.24) + 's';
-        wrap.dataset.id = id;
-        
-        const src = getAvatarSrc(id, state.partyMode);
-
-        wrap.innerHTML = `
-            <img loading="lazy" src="${src}" alt="${role}">
-            <div class="role-label" contenteditable="${!state.viewMode}">${role}</div>
-            <div class="action-container">
-                <div class="mini-btn btn-del" title="Delete">
-                    <span class="material-symbols-outlined">delete</span>
-                </div>
-                <div class="mini-btn btn-remix" title="Remix">
-                    <span class="material-symbols-outlined">refresh</span>
-                </div>
-                <div class="mini-btn btn-color" title="Cycle Color">
-                    <span class="material-symbols-outlined">palette</span>
-                </div>
+    <!-- Scrolling track: centered when it fits, left-aligned and scrollable when it doesn't -->
+    <div class="bar-scroll" id="barScroll">
+    <div class="bar-inner" id="barInner">
+    <!-- Style Group -->
+    <div class="control-group">
+        <span class="group-label">Style</span>
+        <div class="segmented-control" id="styleControl">
+            <div class="segment-opt active" data-val="avataaars" title="Smooth"><span class="material-symbols-outlined">face</span></div>
+            <div class="segment-opt" data-val="pixel" title="Pixel Art">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" shape-rendering="crispEdges">
+                    <rect x="8" y="4" width="8" height="2"/>
+                    <rect x="6" y="6" width="2" height="6"/>
+                    <rect x="16" y="6" width="2" height="6"/>
+                    <rect x="8" y="12" width="8" height="2"/>
+                    <rect x="9" y="7" width="2" height="2"/>
+                    <rect x="13" y="7" width="2" height="2"/>
+                    <rect x="10" y="10" width="4" height="2"/>
+                    <rect x="8" y="14" width="8" height="6"/>
+                    <rect x="6" y="14" width="2" height="4"/>
+                    <rect x="16" y="14" width="2" height="4"/>
+                </svg>
             </div>
-        `;
-        
-        attachEvents(wrap);
-        return wrap;
-    }
+        </div>
+    </div>
 
-    function updateImage(wrap) {
-        // Handle explicit string ID vs numeric ID parsing
-        let id = wrap.dataset.id;
-        // If it looks like a number, parse it, otherwise keep string
-        if (!isNaN(id)) id = parseInt(id);
-        
-        const src = getAvatarSrc(id, state.partyMode);
-        wrap.querySelector('img').src = src;
-    }
+    <!-- Shape / View Group -->
+    <div class="control-group">
+        <span class="group-label" id="viewShapeLabel">Shape</span>
+        <div class="segmented-control" id="shapeControl">
+            <div class="segment-opt active" data-val="oval" title="Oval"><span class="material-symbols-outlined">egg</span></div>
+            <div class="segment-opt" data-val="circle" title="Circle"><span class="material-symbols-outlined">circle</span></div>
+        </div>
+        <div class="segmented-control" id="viewControl" style="display: none;">
+            <div class="segment-opt active" data-val="full" title="Full Body">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" shape-rendering="crispEdges">
+                    <rect x="7" y="20" width="10" height="2" opacity="0.2"/>
+                    <rect x="9" y="14" width="2" height="6"/>
+                    <rect x="13" y="14" width="2" height="6"/>
+                    <rect x="7" y="7" width="10" height="7"/>
+                    <rect x="9" y="2" width="6" height="5"/>
+                </svg>
+            </div>
+            <div class="segment-opt" data-val="head" title="Head Only">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" shape-rendering="crispEdges">
+                    <rect x="4" y="15" width="16" height="9"/>
+                    <rect x="7" y="4" width="10" height="10"/>
+                </svg>
+            </div>
+        </div>
+    </div>
 
-    function attachEvents(wrap) {
-        // Drag
-        wrap.addEventListener('dragstart', e => { if(state.viewMode) { e.preventDefault(); return; } state.dragEl=wrap; wrap.style.opacity='0.5'; });
-        wrap.addEventListener('dragend', () => { wrap.style.opacity='1'; state.dragEl=null; });
-        wrap.addEventListener('dragover', e => e.preventDefault());
-        wrap.addEventListener('drop', e => {
-            e.stopPropagation();
-            if(state.dragEl && state.dragEl !== wrap && state.dragEl.classList.contains('img-wrap')) {
-                const arr = Array.from(grid.children);
-                if(arr.indexOf(state.dragEl) < arr.indexOf(wrap)) grid.insertBefore(state.dragEl, wrap.nextSibling);
-                else grid.insertBefore(state.dragEl, wrap);
-            }
-        });
+    <!-- Size Group (data-collapse: the order controls fold into the ••• menu, 1 first) -->
+    <div class="control-group size-group" data-collapse="3">
+        <span class="group-label menu-only">Size</span>
+        <div class="slider-control" title="Avatar Size">
+            <div class="size-dot dot-small"></div>
+            <input id="sizeSlider" max="250" min="80" type="range" value="120">
+            <div class="size-dot dot-large"></div>
+        </div>
+    </div>
 
-        // Click to Copy
-        wrap.addEventListener('click', async (e) => {
-            if(e.target.isContentEditable || e.target.closest('.mini-btn')) return;
-            
-            const fmt = state.copyFormat;
-            wrap.style.transform = "scale(0.95)";
-            setTimeout(() => wrap.style.transform = "", 100);
+    <!-- Label Group -->
+    <div class="control-group" data-collapse="2">
+        <span class="group-label">Label</span>
+        <div class="segmented-control" id="labelControl">
+            <div class="segment-opt active" data-val="show" title="Show Label"><span class="material-symbols-outlined">visibility</span></div>
+            <div class="segment-opt" data-val="hide" title="Hide Label"><span class="material-symbols-outlined">visibility_off</span></div>
+        </div>
+        <div class="slider-control" title="Font Size">
+            <span class="font-glyph small">A</span>
+            <input id="fontSlider" max="30" min="10" type="range" value="13">
+            <span class="font-glyph large">A</span>
+        </div>
+    </div>
 
-            if(fmt === 'svg') {
-                try {
-                    const src = wrap.querySelector('img').src;
-                    const txt = await fetch(src).then(r=>r.text());
-                    await navigator.clipboard.writeText(txt);
-                    showToast('SVG Code Copied!');
-                } catch(e) { showToast('Error fetching SVG'); }
-            } else {
-                try {
-                    const blob = await generateCardBlob(wrap);
-                    const item = new ClipboardItem({ "image/png": blob });
-                    await navigator.clipboard.write([item]);
-                    showToast('PNG Copied!');
-                } catch(err) { 
-                    console.error("Copy Error:", err); 
-                    showToast('Copy Failed'); 
-                }
-            }
-        });
+    <!-- Animation Group -->
+    <div class="control-group" data-collapse="1">
+        <span class="group-label">Anim</span>
+        <button class="anim-btn" id="pauseBtn" title="Play/Pause (Space)">
+            <span class="material-symbols-outlined" id="pauseIcon">pause</span>
+        </button>
+    </div>
 
-        // Buttons
-        wrap.querySelector('.btn-del').onclick = (e) => { 
-            e.stopPropagation();
-            
-            // Smooth 60fps delete: collapse width to prevent layout jump
-            wrap.style.transform = 'scale(0.3)';
-            wrap.style.opacity = '0';
-            wrap.style.width = '0';
-            wrap.style.marginLeft = '-15px';
-            wrap.style.marginRight = '-15px';
-            wrap.style.overflow = 'hidden';
-            
-            // Remove after transition completes
-            setTimeout(() => wrap.remove(), 400);
-        };
-        
-        wrap.querySelector('.btn-remix').onclick = (e) => {
-            e.stopPropagation();
-            const img = wrap.querySelector('img');
-            
-            // Subtle Fade/Scale Animation
-            img.style.transition = 'all 0.15s ease-out';
-            img.style.opacity = '0';
-            img.style.transform = 'scale(0.9) translateY(5px)';
-            
-            setTimeout(() => {
-                const newId = rndId();
-                wrap.dataset.id = newId;
-                updateImage(wrap);
-                
-                // Entry animation
-                img.style.transition = 'none';
-                img.style.transform = 'scale(0.9) translateY(-5px)';
-                void img.offsetWidth; // Force reflow
-                
-                img.style.transition = 'all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
-                img.style.opacity = '1';
-                img.style.transform = 'scale(1) translateY(0)';
-            }, 150);
-        };
+    </div>
+    </div>
 
-        wrap.querySelector('.btn-color').onclick = (e) => {
-            e.stopPropagation();
-            const current = wrap.style.getPropertyValue('--avatar-bg');
-            let idx = CONFIG.bgColors.indexOf(current);
-            if(idx === -1) idx = 0;
-            const next = CONFIG.bgColors[(idx + 1) % CONFIG.bgColors.length];
-            wrap.style.setProperty('--avatar-bg', next);
-        };
-    }
+    <!-- Settings, then the ⋮ overflow menu when needed (outside the scroller so popovers aren't clipped) -->
+    <div class="bar-end">
+    <!-- Settings -->
+    <div class="settings-wrap">
+        <button class="settings-btn" id="settingsBtn" title="Settings">
+            <span class="material-symbols-outlined">settings</span>
+        </button>
+        <div class="popover settings-popover" id="settingsPanel">
+            <div class="setting-row">
+                <span>Copy Format</span>
+                <select id="copyFormatSelect">
+                    <option selected value="png">PNG (Image)</option>
+                    <option value="svg">SVG (Code)</option>
+                </select>
+            </div>
+            <div class="setting-row">
+                <span>Canvas Theme</span>
+                <select id="bgThemeSelect">
+                    <option value="clean" selected>Clean (Default)</option>
+                    <option value="warm">Warm (Solar)</option>
+                    <option value="cool">Cool (Glacier)</option>
+                    <option value="pastel">Vibrant (Cotton Candy)</option>
+                </select>
+            </div>
+            <div class="setting-row">
+                <span>Drop Shadows</span>
+                <div class="switch" id="shadowToggle"></div>
+            </div>
+            <div class="setting-row">
+                <span>Shadow Color</span>
+                <input id="shadowColorPicker" type="color" value="#000000">
+            </div>
+        </div>
+    </div>
+    <div class="more-wrap" id="moreWrap" hidden>
+        <button class="settings-btn" id="moreBtn" title="More controls">
+            <span class="material-symbols-outlined">more_vert</span>
+        </button>
+        <div class="popover more-popover" id="morePanel"></div>
+    </div>
+    </div>
+</div>
 
-    // --- Generator Core ---
-    async function generateCardBlob(wrap) {
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
-        
-        const size = 600; 
-        canvas.width = size; canvas.height = size;
-        
-        const isCircle = document.body.classList.contains('shape-circle');
-        const wrapBg = wrap.style.getPropertyValue('--avatar-bg') || "#e0e0e0";
-        const cx = size / 2;
-        const cy = size / 2;
+<div class="toast" id="toast"></div>
 
-        // 1. Draw Background
-        ctx.fillStyle = wrapBg;
-        if(state.shadows) {
-            ctx.shadowColor = "rgba(0,0,0,0.2)";
-            ctx.shadowBlur = 20;
-            ctx.shadowOffsetY = 10;
-        } else {
-            ctx.shadowColor = "transparent";
-        }
-        
-        ctx.beginPath();
-        if(isCircle) {
-            ctx.arc(cx, cy, size/2, 0, Math.PI*2);
-        } else {
-            // Oval Background: w=90%, h=80%
-            const w = size * 0.9;
-            const h = size * 0.8;
-            const y = size - (h/2);
-            ctx.ellipse(cx, y, w/2, h/2, 0, 0, Math.PI*2);
-        }
-        ctx.fill();
-        ctx.shadowColor = "transparent"; // Reset for image
-
-        // 2. Prepare Clipping Path
-        ctx.save();
-        ctx.beginPath();
-        if(isCircle) {
-            ctx.arc(cx, cy, size/2, 0, Math.PI*2);
-        } else {
-            // Tombstone Clip for Oval Mode
-            // Bottom half is the oval curve, Top half is open/rect
-            // The oval bg is at y = size - (size*0.8/2) = size - size*0.4 = size*0.6
-            // Wait, standard oval logic:
-            // Center Y = size * 0.6 (since h=0.8, bottom aligned means center is up 0.4 from bottom? No)
-            // Height = 0.8 * size. Bottom is at 'size'. Center is at size - 0.4*size = 0.6*size.
-            // Width = 0.9 * size. RadiusX = 0.45*size. RadiusY = 0.4*size.
-            
-            const rx = size * 0.45;
-            const ry = size * 0.4;
-            const cenY = size - ry; // 600 - 240 = 360
-            
-            // Draw shape:
-            // Start at right middle of the oval
-            ctx.moveTo(cx + rx, cenY);
-            // Arc to left middle via bottom
-            ctx.ellipse(cx, cenY, rx, ry, 0, 0, Math.PI, false); 
-            // Line up to top-left
-            ctx.lineTo(cx - rx, 0); 
-            // Line to top-right
-            ctx.lineTo(cx + rx, 0);
-            // Close
-            ctx.closePath();
-        }
-        ctx.clip();
-
-        // 3. Load & Draw Image
-        const src = wrap.querySelector('img').src;
-        const svgText = await fetch(src).then(r => {
-            if (!r.ok) throw new Error("Fetch failed");
-            return r.text();
-        });
-        
-        const blob = new Blob([svgText], { type: 'image/svg+xml' });
-        const url = URL.createObjectURL(blob);
-        
-        const img = new Image();
-        img.src = url;
-        await new Promise((resolve, reject) => {
-            img.onload = resolve;
-            img.onerror = reject;
-        });
-        
-        // Draw Image (Slight scale up for oval coverage)
-        if(!isCircle) {
-            // Center horizontally, align bottom?
-            // Avatars are square. We draw it 600x600.
-            ctx.drawImage(img, 0, 0, size, size);
-        } else {
-            ctx.drawImage(img, 0, 0, size, size);
-        }
-        
-        ctx.restore(); // Remove Clip
-        URL.revokeObjectURL(url);
-
-        // 4. Draw Label (Badge) - Outside Clip
-        const roleText = wrap.querySelector('.role-label').innerText.toUpperCase();
-        if(roleText && !document.body.classList.contains('hide-labels')) {
-            ctx.save();
-            const fontSize = 60;
-            ctx.font = `bold ${fontSize}px sans-serif`;
-            ctx.textBaseline = 'middle';
-            ctx.textAlign = 'center';
-            
-            const textMetrics = ctx.measureText(roleText);
-            const paddingX = 40;
-            const paddingY = 20;
-            const badgeW = textMetrics.width + (paddingX * 2);
-            const badgeH = fontSize + (paddingY * 2);
-            const badgeX = cx - (badgeW / 2);
-            const badgeY = size - badgeH - 30;
-
-            // Badge BG
-            ctx.fillStyle = wrapBg;
-            ctx.shadowColor = "rgba(0,0,0,0.2)";
-            ctx.shadowBlur = 10;
-            ctx.shadowOffsetY = 5;
-            
-            ctx.beginPath();
-            ctx.roundRect(badgeX, badgeY, badgeW, badgeH, 20);
-            ctx.fill();
-            ctx.shadowColor = "transparent";
-            
-            // Badge Border
-            ctx.strokeStyle = "rgba(255,255,255,0.5)";
-            ctx.lineWidth = 4;
-            ctx.stroke();
-
-            // Text
-            ctx.fillStyle = "rgba(0,0,0,0.7)";
-            ctx.fillText(roleText, cx, badgeY + (badgeH/2) + 4);
-            ctx.restore();
-        }
-
-        return new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
-    }
-
-    // --- Confetti ---
-    class ConfettiEngine {
-        constructor() {
-            this.canvas = document.getElementById('confetti-canvas');
-            this.ctx = this.canvas.getContext('2d');
-            this.particles = [];
-            this.active = false;
-            this.resize();
-            window.addEventListener('resize', () => this.resize());
-        }
-        resize() { this.canvas.width = window.innerWidth; this.canvas.height = window.innerHeight; }
-        start() { if(this.active) return; this.active = true; this.loop(); }
-        stop() { this.active = false; this.ctx.clearRect(0,0,this.canvas.width,this.canvas.height); this.particles = []; }
-        loop() {
-            if(!this.active) return;
-            requestAnimationFrame(() => this.loop());
-            this.update(); this.draw();
-        }
-        update() {
-            if(this.particles.length < 150) {
-                this.particles.push({
-                    x: Math.random() * this.canvas.width, y: -20,
-                    size: Math.random() * 8 + 4,
-                    color: CONFIG.bgColors[Math.floor(Math.random() * CONFIG.bgColors.length)],
-                    speed: Math.random() * 3 + 2,
-                    wobble: Math.random() * Math.PI * 2, wobbleSpeed: 0.1
-                });
-            }
-            this.particles.forEach((p, i) => {
-                p.y += p.speed; p.wobble += p.wobbleSpeed; p.x += Math.sin(p.wobble) * 2;
-                if(p.y > this.canvas.height) this.particles.splice(i, 1);
-            });
-        }
-        draw() {
-            this.ctx.clearRect(0,0,this.canvas.width, this.canvas.height);
-            this.particles.forEach(p => {
-                this.ctx.fillStyle = p.color; this.ctx.fillRect(p.x, p.y, p.size, p.size);
-            });
-        }
-    }
-    const confetti = new ConfettiEngine();
-
-    // --- Toggles & Sliders ---
-    function setupToggle(id, callback) {
-        const container = document.getElementById(id);
-        const opts = container.querySelectorAll('.segment-opt');
-        opts.forEach(opt => {
-            opt.onclick = () => {
-                opts.forEach(o => o.classList.remove('active'));
-                opt.classList.add('active');
-                callback(opt.dataset.val);
-            };
-        });
-    }
-
-    setupToggle('shapeControl', (val) => {
-        document.body.classList.toggle('shape-circle', val === 'circle');
-        document.body.classList.toggle('shape-oval', val === 'oval');
-    });
-
-    setupToggle('labelControl', (val) => {
-        document.body.classList.toggle('hide-labels', val === 'hide');
-    });
-
-    setupToggle('themeControl', (val) => {
-        state.darkMode = (val === 'dark');
-        document.body.classList.toggle('dark-mode', state.darkMode);
-        if(state.darkMode) {
-            document.documentElement.style.setProperty('--bg-color', '#0f172a');
-        } else {
-            document.documentElement.style.setProperty('--bg-color', document.getElementById('bgColorPicker').value);
-        }
-        updateShadows();
-    });
-
-    function addSlideListeners(slider, cssVar) {
-        slider.addEventListener('mousedown', () => document.body.classList.add('sliding-active'));
-        slider.addEventListener('mouseup', () => document.body.classList.remove('sliding-active'));
-        slider.addEventListener('input', (e) => {
-            document.documentElement.style.setProperty(cssVar, e.target.value + 'px');
-        });
-    }
-    addSlideListeners(document.getElementById('sizeSlider'), '--avatar-size');
-    addSlideListeners(document.getElementById('fontSlider'), '--label-size');
-
-    function updateShadows() {
-        if(state.darkMode) {
-            document.documentElement.style.setProperty('--avatar-shadow', state.shadows ? 'var(--shadow-dark-preset)' : 'none');
-        } else {
-            const hex = document.getElementById('shadowColorPicker').value;
-            document.documentElement.style.setProperty('--avatar-shadow', state.shadows ? `drop-shadow(0 4px 8px ${hex}80)` : 'none');
-        }
-    }
-
-    // Top buttons
-    document.getElementById('partyBtn').onclick = function() {
-        state.partyMode = !state.partyMode;
-        this.classList.toggle('active', state.partyMode);
-        document.body.classList.toggle('party-active', state.partyMode);
-        
-        const brief = this.querySelector('.briefcase-icon');
-        const party = this.querySelector('.party-icon');
-        if(state.partyMode) {
-            brief.style.display = 'none'; party.style.display = 'block'; confetti.start();
-        } else {
-            brief.style.display = 'block'; party.style.display = 'none'; confetti.stop();
-        }
-        Array.from(grid.children).forEach(c => c.classList.contains('img-wrap') && updateImage(c));
-        showToast(state.partyMode ? "Party Mode!" : "Business Mode");
-    };
-
-    document.getElementById('viewBtn').onclick = function() {
-        setViewMode(!state.viewMode);
-    };
-    
-    function setViewMode(isView) {
-        state.viewMode = isView;
-        document.body.classList.toggle('view-mode', state.viewMode);
-        document.getElementById('viewBtn').classList.toggle('active', state.viewMode);
-        
-        // Update contenteditable
-        const editable = !state.viewMode;
-        document.getElementById('siteTitle').contentEditable = editable;
-        document.querySelectorAll('.role-label').forEach(el => el.contentEditable = editable);
-        
-        showToast(state.viewMode ? "View Mode" : "Edit Mode");
-    }
-
-    function checkEditTrigger() {
-        if(state.viewMode) {
-            setViewMode(false);
-            showToast("Switched to Edit Mode");
-        }
-    }
-    document.getElementById('siteTitle').addEventListener('dblclick', checkEditTrigger);
-    grid.addEventListener('dblclick', (e) => {
-        if(e.target.classList.contains('role-label')) checkEditTrigger();
-    });
-
-    // Animation Pause
-    function toggleAnimation() {
-        state.isPaused = !state.isPaused;
-        document.body.classList.toggle('animations-paused', state.isPaused);
-        const icon = document.getElementById('pauseIcon');
-        const btn = document.getElementById('pauseBtn');
-        if(state.isPaused) {
-            icon.textContent = 'play_arrow';
-            btn.classList.add('paused');
-            showToast("Animation Paused");
-        } else {
-            icon.textContent = 'pause';
-            btn.classList.remove('paused');
-            showToast("Animation Playing");
-        }
-    }
-    document.getElementById('pauseBtn').onclick = toggleAnimation;
-
-    document.addEventListener('keydown', (e) => {
-        if(e.code === 'Space' && !e.target.isContentEditable) {
-            e.preventDefault();
-            toggleAnimation();
-        }
-    });
-
-    const settingsBtn = document.getElementById('settingsBtn');
-    const settingsPanel = document.getElementById('settingsPanel');
-    settingsBtn.onclick = (e) => {
-        e.stopPropagation();
-        
-        // Dynamic Positioning
-        const rect = settingsBtn.getBoundingClientRect();
-        const panelW = 240; // CSS width
-        // Right align: Panel Right = Button Right
-        const left = rect.right - panelW; 
-        const bottom = window.innerHeight - rect.top + 15;
-        
-        settingsPanel.style.left = `${left}px`;
-        settingsPanel.style.bottom = `${bottom}px`;
-        
-        settingsPanel.classList.toggle('active');
-        settingsBtn.classList.toggle('active');
-    };
-    
-    document.addEventListener('click', (e) => {
-        if(!settingsPanel.contains(e.target) && !settingsBtn.contains(e.target) && !e.target.closest('input')) {
-            settingsPanel.classList.remove('active');
-            settingsBtn.classList.remove('active');
-        }
-    });
-
-    document.getElementById('copyFormatSelect').onchange = (e) => { state.copyFormat = e.target.value; };
-    document.getElementById('shadowToggle').onclick = function() {
-        state.shadows = !state.shadows;
-        this.classList.toggle('on', state.shadows);
-        updateShadows();
-    };
-    document.getElementById('bgColorPicker').oninput = (e) => {
-        document.documentElement.style.setProperty('--bg-color', e.target.value);
-    };
-    document.getElementById('shadowColorPicker').oninput = updateShadows;
-
-    document.getElementById('downloadAllBtn').onclick = async () => {
-        const items = Array.from(document.querySelectorAll('.img-wrap'));
-        if(!items.length) return;
-        
-        showToast("Generating Zip...");
-        const zip = new JSZip();
-        
-        try {
-            // Process sequentially or parallel? Parallel might choke browser canvas limit. Sequential safer.
-            for (let i = 0; i < items.length; i++) {
-                const wrap = items[i];
-                const name = wrap.querySelector('.role-label').innerText.trim() || `avatar_${i}`;
-                const blob = await generateCardBlob(wrap);
-                zip.file(`${name}.png`, blob);
-            }
-            
-            showToast("Zipping...");
-            const zipBlob = await zip.generateAsync({type:"blob"});
-            saveAs(zipBlob, "security_personas.zip");
-            showToast("Download Started");
-        } catch (e) {
-            console.error(e);
-            showToast("Zip Generation Failed");
-        }
-    };
-
-    function showToast(msg) {
-        const t = document.getElementById('toast');
-        t.innerText = msg; t.style.opacity = 1; setTimeout(()=>t.style.opacity=0, 2000);
-    }
-
-    // --- State Management (Sharing) ---
-    function getShareState() {
-        const avatars = [];
-        grid.querySelectorAll('.img-wrap').forEach(w => {
-            avatars.push({
-                role: w.querySelector('.role-label').innerText,
-                id: w.dataset.id, // Store as string if necessary for role-based IDs
-                bg: w.style.getPropertyValue('--avatar-bg')
-            });
-        });
-
-        return {
-            title: document.getElementById('siteTitle').innerText,
-            settings: {
-                darkMode: state.darkMode,
-                shadows: state.shadows,
-                partyMode: state.partyMode,
-                viewMode: true,
-                shape: document.body.classList.contains('shape-circle') ? 'circle' : 'oval',
-                size: document.getElementById('sizeSlider').value,
-                fontSize: document.getElementById('fontSlider').value,
-                bgColor: document.getElementById('bgColorPicker').value,
-                shadowColor: document.getElementById('shadowColorPicker').value,
-                hideLabels: document.body.classList.contains('hide-labels')
-            },
-            roster: avatars
-        };
-    }
-
-    document.getElementById('shareBtn').onclick = () => {
-        const data = getShareState();
-        const json = JSON.stringify(data);
-        const encoded = encodeURIComponent(json);
-        const url = new URL(window.location);
-        url.searchParams.set('data', encoded);
-        
-        navigator.clipboard.writeText(url.toString()).then(() => {
-            showToast("View Link Copied!");
-            window.history.replaceState({}, '', url);
-        }).catch(() => showToast("Failed to copy"));
-    };
-
-    function restoreState() {
-        const params = new URLSearchParams(window.location.search);
-        const dataStr = params.get('data');
-        
-        let rosterToLoad = INITIAL_ROSTER;
-        
-        if (dataStr) {
-            try {
-                const data = JSON.parse(decodeURIComponent(dataStr));
-                
-                if(data.title) document.getElementById('siteTitle').innerText = data.title;
-                
-                if(data.settings) {
-                    const s = data.settings;
-                    
-                    document.getElementById('sizeSlider').value = s.size || 120;
-                    document.documentElement.style.setProperty('--avatar-size', (s.size || 120) + 'px');
-                    
-                    document.getElementById('fontSlider').value = s.fontSize || 13;
-                    document.documentElement.style.setProperty('--label-size', (s.fontSize || 13) + 'px');
-
-                    if(s.bgColor) {
-                        document.getElementById('bgColorPicker').value = s.bgColor;
-                        if(!s.darkMode) document.documentElement.style.setProperty('--bg-color', s.bgColor);
-                    }
-                    if(s.shadowColor) document.getElementById('shadowColorPicker').value = s.shadowColor;
-
-                    if(s.darkMode) document.getElementById('themeControl').querySelector('[data-val="dark"]').click();
-                    if(s.shape) document.getElementById('shapeControl').querySelector(`[data-val="${s.shape}"]`).click();
-                    
-                    if(s.hideLabels) document.getElementById('labelControl').querySelector('[data-val="hide"]').click();
-                    else document.getElementById('labelControl').querySelector('[data-val="show"]').click();
-                    
-                    if(s.partyMode) document.getElementById('partyBtn').click();
-                    
-                    // View mode logic
-                    if(s.viewMode) setViewMode(true);
-                    
-                    if(s.shadows) {
-                        state.shadows = true;
-                        document.getElementById('shadowToggle').classList.add('on');
-                        updateShadows();
-                    }
-                }
-
-                if(data.roster && Array.isArray(data.roster)) rosterToLoad = data.roster;
-                
-            } catch(e) {
-                console.error("Failed to parse share data", e);
-                showToast("Error loading shared config");
-            }
-        }
-
-        grid.innerHTML = '';
-        grid.appendChild(addCard);
-        
-        rosterToLoad.forEach((d, i) => {
-            grid.insertBefore(createAvatar(d, i), addCard);
-        });
-    }
-
-    // Ensure createAvatar sets correct editable state
-    const originalCreateAvatar = createAvatar;
-    createAvatar = function(data, index) {
-        const wrap = originalCreateAvatar(data, index);
-        wrap.querySelector('.role-label').contentEditable = !state.viewMode;
-        return wrap;
-    }
-
-    // Init
-    restoreState();
-
-</script>
+<!-- App scripts (plain scripts, load order matters; no build step) -->
+<script src="js/config.js"></script>
+<script src="js/avatars.js"></script>
+<script src="js/pixel-art.js"></script>
+<script src="js/export.js"></script>
+<script src="js/confetti.js"></script>
+<script src="js/ai.js"></script>
+<script src="js/share.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

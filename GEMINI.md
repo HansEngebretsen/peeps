@@ -1,22 +1,29 @@
 # Project Context: Security Avatars Studio
 
 ## Overview
-This is a single-file HTML/CSS/JS application ("onepager") for generating and managing security role avatars.
+A static HTML/CSS/JS app for generating and managing security role avatars ("peeps").
 
 ## Architecture
-- **Format:** Single `index.html` file containing all structure, styles, and logic.
-- **Tech Stack:** Vanilla HTML5, CSS3 (using CSS Variables for theming), and JavaScript (ES6+).
-- **External Dependencies:** 
-  - Google Material Symbols (linked via CSS).
-  - Avataaars API (for avatar image generation).
+- `index.html` — markup only.
+- `css/styles.css` — all styles (CSS variables for theming, light/dark, canvas themes, pixel theme).
+- `js/` — plain scripts loaded in order from `index.html` (no modules, no build step):
+  - `config.js` — `CONFIG`, `INITIAL_ROSTER`, global `state`, AI settings.
+  - `avatars.js` — resolves an avatar's image (local SVGs or pixel art).
+  - `pixel-art.js` — deterministic pixel-art SVG generator.
+  - `export.js` — PNG card rendering, clipboard copy, zip download.
+  - `confetti.js` — party-mode confetti.
+  - `ai.js` — Gemini persona generation (API key kept in browser localStorage).
+  - `share.js` — share-link serialise/restore (`?data=`).
+  - `app.js` — grid, avatar cards, controls, init.
+- `assets/` — pre-downloaded avatar SVGs (`roster/`, `random_business/`, `random_party/`).
+- `server.sh` — runs a local static server (`./server.sh [port]`).
 
-## Programming Style
-- **Modularity:** Logic is contained within the `<script>` tag at the bottom of the body. Styles are in `<style>` in the head.
-- **State Management:** Simple global `state` object.
-- **DOM Manipulation:** Direct DOM manipulation (document.createElement, innerHTML, event listeners).
-- **No Build Step:** The file is meant to run directly in a browser. Do not introduce build tools (Webpack, etc.) unless explicitly requested.
+## Tech Stack
+- Vanilla HTML5, CSS3, JavaScript (ES2020+).
+- External: Google Material Symbols + VT323 fonts, JSZip & FileSaver (cdnjs), Gemini API (optional).
 
 ## Conventions
-- Keep it contained in `index.html`.
-- Use CSS variables for easy theming (light/dark mode).
-- Ensure responsiveness and interactivity (drag & drop, content editable).
+- No build tools unless explicitly requested.
+- Avatar images come from local `assets/`, not remote APIs.
+- Use CSS variables for theming.
+- Serve over HTTP (`./server.sh`) — copy/export fetch local SVGs, which `file://` blocks.
