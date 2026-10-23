@@ -1,6 +1,6 @@
 # `peeps`
 
-A lineup of illustrated personas for decks and docs. Rename them, remix them, and paste them straight into your slides.
+Illustrated personas for slides and docs. Name them, restyle them, and copy them out as images.
 
 
 <div align="center">
@@ -11,7 +11,7 @@ A lineup of illustrated personas for decks and docs. Rename them, remix them, an
 
 
 <p align="center">
-<img src="demos/hero.png" alt="app" width="500">
+<img src="demos/hero.gif" alt="app" width="500">
 </p>
 
 ## Features
@@ -19,56 +19,56 @@ A lineup of illustrated personas for decks and docs. Rename them, remix them, an
 <table>
 <tr valign="top">
 <td width="50%">
-<h3>Click to copy a PNG</h3>
-<p>Click any person and they're on your clipboard, ready to paste into slides or docs. Switch to SVG in settings, or use Download All to get the whole lineup as a zip.</p>
+<h3>Copy any persona</h3>
+<p>Click a persona to copy it as a PNG. Settings switches the format to SVG, and Download All saves the whole set as a zip.</p>
 </td>
 <td width="50%">
-<img src="demos/copy.gif" alt="Click to copy a PNG">
-</td>
-</tr>
-<tr valign="top">
-<td width="50%">
-<img src="demos/add.gif" alt="Add someone and name them">
-</td>
-<td width="50%">
-<h3>Add someone and name them</h3>
-<p>The + adds a new persona with its label already selected, so you can type the role straight away. Or describe a team, and the sparkle button generates a whole lineup using your own Gemini key.</p>
+<img src="demos/copy.gif" alt="Copy any persona">
 </td>
 </tr>
 <tr valign="top">
 <td width="50%">
-<h3>Remix the face, cycle the color</h3>
-<p>Hover a person to remix them into someone new, cycle their background color, copy them, or remove them.</p>
+<img src="demos/add.gif" alt="Add and name personas">
 </td>
 <td width="50%">
-<img src="demos/remix.gif" alt="Remix the face, cycle the color">
-</td>
-</tr>
-<tr valign="top">
-<td width="50%">
-<img src="demos/pixel.gif" alt="Go pixel">
-</td>
-<td width="50%">
-<h3>Go pixel</h3>
-<p>Turn the whole lineup into pixel peeps, then switch between full body and just heads. Copy and download work the same way.</p>
+<h3>Add and name personas</h3>
+<p>The + button adds a persona and selects its label so you can type a role. The sparkle button can also generate a full set from a description, using your own Gemini API key.</p>
 </td>
 </tr>
 <tr valign="top">
 <td width="50%">
-<h3>Party mode, day or night</h3>
-<p>Same team in party outfits, with confetti. The moon in the top corner switches everything to night.</p>
+<h3>Change the face, color and name</h3>
+<p>Hover a persona for buttons to swap the face, cycle the background color, copy it or remove it. Click the label to rename it.</p>
 </td>
 <td width="50%">
-<img src="demos/party.gif" alt="Party mode, day or night">
+<img src="demos/remix.gif" alt="Change the face, color and name">
 </td>
 </tr>
 <tr valign="top">
 <td width="50%">
-<img src="demos/style.gif" alt="Reshape the whole lineup">
+<img src="demos/pixel.gif" alt="Switch to pixel art">
 </td>
 <td width="50%">
-<h3>Reshape the whole lineup</h3>
-<p>Choose circles or ovals at any size. Share copies a link to the exact lineup and style.</p>
+<h3>Switch to pixel art</h3>
+<p>Pixel style redraws every persona as pixel art, shown full body or head only. Copying and downloading work the same way.</p>
+</td>
+</tr>
+<tr valign="top">
+<td width="50%">
+<h3>Set the shape and size</h3>
+<p>Choose circle or oval backgrounds and resize the whole set at once. Share copies a link to the current set and style.</p>
+</td>
+<td width="50%">
+<img src="demos/style.gif" alt="Set the shape and size">
+</td>
+</tr>
+<tr valign="top">
+<td width="50%">
+<img src="demos/party.gif" alt="Party mode and dark mode">
+</td>
+<td width="50%">
+<h3>Party mode and dark mode</h3>
+<p>Party mode changes everyone's outfit and adds confetti. The moon icon in the top bar switches to dark mode.</p>
 </td>
 </tr>
 </table>
