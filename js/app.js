@@ -190,7 +190,8 @@ setupToggle('styleControl', (val) => {
     const isPixel = val === 'pixel';
     document.body.classList.toggle('pixel-theme', isPixel);
     document.body.classList.toggle('line-theme', isLineStyle());
-    document.getElementById('inkGroup').hidden = !isLineStyle();
+    const inkGroup = document.getElementById('inkGroup');
+    if (inkGroup) inkGroup.hidden = !isLineStyle();
     document.getElementById('shapeControl').style.display = isPixel ? 'none' : 'flex';
     document.getElementById('viewControl').style.display = isPixel ? 'flex' : 'none';
     document.getElementById('viewShapeLabel').innerText = isPixel ? 'View' : 'Shape';
@@ -221,14 +222,17 @@ function setInk(ink, { silent = false } = {}) {
         sw.classList.toggle('active', sw.dataset.ink ? sw.dataset.ink === state.ink : !preset);
     });
     const custom = document.getElementById('inkPicker');
-    custom.value = state.ink;
-    custom.parentElement.style.setProperty('--sw', preset ? '' : state.ink);
+    if (custom) {
+        custom.value = state.ink;
+        custom.parentElement.style.setProperty('--sw', preset ? '' : state.ink);
+    }
     grid.querySelectorAll('.img-wrap').forEach(w => setCardInk(w, null));
     if (!silent) updateAllImages();
 }
 
 (function buildInkSwatches() {
     const control = document.getElementById('inkControl');
+    if (!control) return;   // a cached older index.html without the ink picker
     const custom = control.querySelector('.ink-custom');
     CONFIG.inkColors.forEach(ink => {
         const sw = document.createElement('button');
