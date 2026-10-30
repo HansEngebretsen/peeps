@@ -245,7 +245,7 @@ body.shape-circle { --mask-w-mult: 1.0; --mask-h-mult: 1.0; }
 }
 
 /* Oval: tombstone mask — ellipse at the bottom, open rectangle above its equator */
-body.shape-oval:not(.pixel-theme) .img-wrap img {
+body.shape-oval:not(.pixel-theme):not(.line-theme) .img-wrap img {
     --mask-w: calc(var(--avatar-size) * var(--mask-w-mult));
     --mask-h: calc(var(--avatar-size) * var(--mask-h-mult));
     --mask-eq: calc(var(--mask-h) / 2);
@@ -268,7 +268,7 @@ body.shape-oval:not(.pixel-theme) .img-wrap img {
 }
 
 /* Circle: rounded bottom, open top for hair overflow */
-body.shape-circle:not(.pixel-theme) .img-wrap img {
+body.shape-circle:not(.pixel-theme):not(.line-theme) .img-wrap img {
     mask-image: none;
     -webkit-mask-image: none;
     --r: calc(var(--avatar-size) / 2);
@@ -301,6 +301,47 @@ body.pixel-theme .role-label {
 }
 body.pixel-theme .img-wrap::before { border-radius: 0 !important; }
 body.pixel-theme .add-card::after  { border-radius: 0; }
+
+/* --- Line Theme (Line and Ink styles): the SVG draws its own frame on paper --- */
+:root { --board-ink: #2b3fbf; }
+.img-wrap { --ink: var(--board-ink); }
+body.line-theme .img-wrap::before { opacity: 0; }
+body.line-theme .img-wrap img {
+    height: 100%;
+    min-height: 0;
+    object-fit: contain;
+    transform-origin: center;
+}
+body.line-theme .role-label {
+    background: #ffffff;
+    color: var(--ink);
+    border: 2px solid var(--ink);
+    border-radius: 999px;
+    box-shadow: none;
+    bottom: -2px;
+    padding: 2px 9px;
+}
+body.line-theme .role-label:focus { background: #ffffff; }
+
+/* Ink swatches */
+.control-group[hidden] { display: none; }
+.ink-swatches { display: flex; align-items: center; gap: 6px; }
+.ink-swatch {
+    width: 20px; height: 20px; padding: 0; flex-shrink: 0;
+    border-radius: 50%; border: none; cursor: pointer;
+    background: var(--sw);
+    box-shadow: inset 0 0 0 1px rgba(0,0,0,0.08);
+    transition: transform 0.15s var(--ease-snappy), box-shadow 0.15s ease;
+}
+.dark-mode .ink-swatch { box-shadow: inset 0 0 0 1px rgba(255,255,255,0.3); }
+.ink-swatch:hover { transform: scale(1.12); }
+.ink-swatch.active, .dark-mode .ink-swatch.active { box-shadow: 0 0 0 2px var(--ui-active-bg), 0 0 0 4px var(--sw, var(--ui-text)); }
+/* Custom: a colour wheel until a custom ink is picked, then that colour */
+.ink-custom {
+    position: relative; overflow: hidden;
+    background: var(--sw, conic-gradient(#ef4444, #f59e0b, #10b981, #3b82f6, #8b5cf6, #ef4444));
+}
+.ink-custom input[type="color"] { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
 
 /* Pixel view type: full body vs head only */
 body.pixel-theme[data-view="full"] .img-wrap::before {

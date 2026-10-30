@@ -59,6 +59,7 @@ function createAvatar(data, index) {
     wrap.style.animationDelay = (index * 0.24) + 's';
     wrap.dataset.id = id;
     wrap.dataset.seed = data.seed || newSeed(role);
+    if (data.ink) setCardInk(wrap, data.ink);
 
     wrap.innerHTML = `
         <img alt="">
@@ -144,6 +145,13 @@ function attachEvents(wrap) {
     wrap.querySelector('.btn-remix').onclick = (e) => { e.stopPropagation(); remixAvatar(wrap); };
     wrap.querySelector('.btn-color').onclick = (e) => {
         e.stopPropagation();
+        // Line styles: cycle this card's ink. Other styles: cycle its background.
+        if (isLineStyle()) {
+            const idx = CONFIG.inkColors.indexOf(inkFor(wrap));
+            setCardInk(wrap, CONFIG.inkColors[(idx + 1) % CONFIG.inkColors.length]);
+            updateImage(wrap);
+            return;
+        }
         const current = wrap.style.getPropertyValue('--avatar-bg');
         const idx = Math.max(0, CONFIG.bgColors.indexOf(current));
         wrap.style.setProperty('--avatar-bg', CONFIG.bgColors[(idx + 1) % CONFIG.bgColors.length]);
@@ -175,22 +183,65 @@ function setupToggle(id, callback) {
     });
 }
 
+const STYLE_NAMES = { avataaars: 'Modern', line: 'Line', ink: 'Ink', pixel: 'Pixel Art' };
+
 setupToggle('styleControl', (val) => {
     state.avatarStyle = val;
     const isPixel = val === 'pixel';
     document.body.classList.toggle('pixel-theme', isPixel);
+    document.body.classList.toggle('line-theme', isLineStyle());
+    document.getElementById('inkGroup').hidden = !isLineStyle();
     document.getElementById('shapeControl').style.display = isPixel ? 'none' : 'flex';
     document.getElementById('viewControl').style.display = isPixel ? 'flex' : 'none';
     document.getElementById('viewShapeLabel').innerText = isPixel ? 'View' : 'Shape';
     scheduleBarLayout();
     updateAllImages();
-    showToast(`Switched to ${isPixel ? 'Pixel Art' : 'Modern'} style`);
+    showToast(`Switched to ${STYLE_NAMES[val]} style`);
 });
 
 setupToggle('shapeControl', (val) => {
     document.body.classList.toggle('shape-circle', val === 'circle');
     document.body.classList.toggle('shape-oval', val === 'oval');
+    if (isLineStyle()) updateAllImages();   // line styles draw their own frame
 });
+
+// --- Ink colour (Line and Ink styles) --------------------------------------
+function setCardInk(wrap, ink) {
+    if (ink) wrap.dataset.ink = ink; else delete wrap.dataset.ink;
+    if (ink) wrap.style.setProperty('--ink', ink); else wrap.style.removeProperty('--ink');
+}
+
+// Picking a board ink recolours everyone, clearing per-card colours
+function setInk(ink, { silent = false } = {}) {
+    if (!/^#[0-9a-f]{6}$/i.test(ink)) return;
+    state.ink = ink.toLowerCase();
+    document.documentElement.style.setProperty('--board-ink', state.ink);
+    const preset = CONFIG.inkColors.includes(state.ink);
+    document.querySelectorAll('#inkControl .ink-swatch').forEach(sw => {
+        sw.classList.toggle('active', sw.dataset.ink ? sw.dataset.ink === state.ink : !preset);
+    });
+    const custom = document.getElementById('inkPicker');
+    custom.value = state.ink;
+    custom.parentElement.style.setProperty('--sw', preset ? '' : state.ink);
+    grid.querySelectorAll('.img-wrap').forEach(w => setCardInk(w, null));
+    if (!silent) updateAllImages();
+}
+
+(function buildInkSwatches() {
+    const control = document.getElementById('inkControl');
+    const custom = control.querySelector('.ink-custom');
+    CONFIG.inkColors.forEach(ink => {
+        const sw = document.createElement('button');
+        sw.className = 'ink-swatch';
+        sw.dataset.ink = ink;
+        sw.title = ink;
+        sw.style.setProperty('--sw', ink);
+        sw.onclick = () => setInk(ink);
+        control.insertBefore(sw, custom);
+    });
+    document.getElementById('inkPicker').oninput = (e) => setInk(e.target.value);
+    setInk(state.ink, { silent: true });
+})();
 
 setupToggle('viewControl', (val) => {
     document.body.setAttribute('data-view', val);

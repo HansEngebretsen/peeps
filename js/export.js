@@ -21,6 +21,9 @@ async function svgToImage(svgText) {
 
 // The SVG source for a wrap, as text (local file or generated pixel art)
 async function getAvatarSvgText(wrap, size) {
+    if (isLineStyle()) {
+        return buildLineSVG(wrap.dataset.seed, lineOptions(wrap, size));
+    }
     if (state.avatarStyle === 'pixel') {
         return buildPixelSVG(wrap.dataset.seed, state.partyMode, getViewType(), size);
     }
@@ -28,6 +31,28 @@ async function getAvatarSvgText(wrap, size) {
     const r = await fetch(src);
     if (!r.ok) throw new Error('Fetch failed');
     return r.text();
+}
+
+// Line styles: a paper pill outlined and lettered in the ink
+function drawInkBadge(ctx, ink, text, cx, size) {
+    const fontSize = 54;
+    ctx.save();
+    ctx.font = `bold ${fontSize}px sans-serif`;
+    ctx.textBaseline = 'middle';
+    ctx.textAlign = 'center';
+    const badgeW = ctx.measureText(text).width + 80;
+    const badgeH = fontSize + 36;
+    const badgeY = size - badgeH - 12;
+    ctx.beginPath();
+    ctx.roundRect(cx - badgeW / 2, badgeY, badgeW, badgeH, badgeH / 2);
+    ctx.fillStyle = '#ffffff';
+    ctx.fill();
+    ctx.lineWidth = 9;
+    ctx.strokeStyle = ink;
+    ctx.stroke();
+    ctx.fillStyle = ink;
+    ctx.fillText(text, cx, badgeY + badgeH / 2 + 3);
+    ctx.restore();
 }
 
 function drawBadge(ctx, wrapBg, text, cx, size, pixel) {
@@ -84,7 +109,13 @@ async function generateCardBlob(wrap) {
         }
     };
 
-    if (isPixel) {
+    if (isLineStyle()) {
+        // The SVG carries its own frame and paper, so it fills the card as-is
+        applyShadow();
+        const img = await svgToImage(await getAvatarSvgText(wrap, { width: size, height: size }));
+        ctx.drawImage(img, 0, 0, size, size);
+        ctx.shadowColor = "transparent";
+    } else if (isPixel) {
         ctx.imageSmoothingEnabled = false;
         if (view === 'head') {
             // Square tile background, sprite fills it
@@ -146,7 +177,8 @@ async function generateCardBlob(wrap) {
     // 4. Label badge
     const roleText = wrap.querySelector('.role-label').innerText.trim().toUpperCase();
     if (roleText && !document.body.classList.contains('hide-labels')) {
-        drawBadge(ctx, wrapBg, roleText, cx, size, isPixel);
+        if (isLineStyle()) drawInkBadge(ctx, inkFor(wrap), roleText, cx, size);
+        else drawBadge(ctx, wrapBg, roleText, cx, size, isPixel);
     }
 
     return new Promise(resolve => canvas.toBlob(resolve, 'image/png'));

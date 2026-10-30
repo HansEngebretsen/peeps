@@ -9,7 +9,8 @@ function getShareState() {
             role: w.querySelector('.role-label').innerText,
             id: w.dataset.id,
             seed: w.dataset.seed,
-            bg: w.style.getPropertyValue('--avatar-bg')
+            bg: w.style.getPropertyValue('--avatar-bg'),
+            ink: w.dataset.ink || undefined
         });
     });
 
@@ -17,6 +18,7 @@ function getShareState() {
         title: document.getElementById('siteTitle').innerText,
         settings: {
             style: state.avatarStyle,
+            ink: state.ink,
             view: getViewType(),
             darkMode: state.darkMode,
             shadows: state.shadows,
@@ -83,6 +85,7 @@ function readSharedState() {
     }
     if (s.shadowColor) document.getElementById('shadowColorPicker').value = s.shadowColor;
 
+    if (s.ink) setInk(s.ink, { silent: true });
     if (s.style) clickOpt('styleControl', s.style);
     if (s.view) clickOpt('viewControl', s.view);
     if (s.darkMode) setDarkMode(true);

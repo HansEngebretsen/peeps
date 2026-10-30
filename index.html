@@ -83,6 +83,21 @@
         <span class="group-label">Style</span>
         <div class="segmented-control" id="styleControl">
             <div class="segment-opt active" data-val="avataaars" title="Smooth"><span class="material-symbols-outlined">face</span></div>
+            <div class="segment-opt" data-val="line" title="Line">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M7.5 6.2A8.5 8.5 0 1 0 16.5 6.2"/>
+                    <circle cx="12" cy="9" r="4"/>
+                    <path d="M6 19.5c1.2-3 3.4-4.5 6-4.5s4.8 1.5 6 4.5"/>
+                </svg>
+            </div>
+            <div class="segment-opt" data-val="ink" title="Ink">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M7.5 6.2A8.5 8.5 0 1 0 16.5 6.2"/>
+                    <circle cx="12" cy="9" r="4"/>
+                    <path d="M8 9.2C7.6 6 9.6 4.6 12 4.6s4.4 1.4 4 4.6c-.8-1.2-2-1.8-4-1.8s-3.2.6-4 1.8z" fill="currentColor"/>
+                    <path d="M6 19.5c1.2-3 3.4-4.5 6-4.5s4.8 1.5 6 4.5"/>
+                </svg>
+            </div>
             <div class="segment-opt" data-val="pixel" title="Pixel Art">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" shape-rendering="crispEdges">
                     <rect x="8" y="4" width="8" height="2"/>
@@ -133,6 +148,14 @@
             <div class="size-dot dot-small"></div>
             <input id="sizeSlider" max="250" min="80" type="range" value="120">
             <div class="size-dot dot-large"></div>
+        </div>
+    </div>
+
+    <!-- Ink colour (Line and Ink styles only; swatches added by js/app.js) -->
+    <div class="control-group ink-group" id="inkGroup" data-collapse="4" hidden>
+        <span class="group-label">Ink</span>
+        <div class="ink-swatches" id="inkControl">
+            <label class="ink-swatch ink-custom" title="Custom color"><input id="inkPicker" type="color" value="#2b3fbf"></label>
         </div>
     </div>
 
@@ -210,6 +233,7 @@
 <script src="js/config.js"></script>
 <script src="js/avatars.js"></script>
 <script src="js/pixel-art.js"></script>
+<script src="js/line-art.js"></script>
 <script src="js/export.js"></script>
 <script src="js/confetti.js"></script>
 <script src="js/ai.js"></script>

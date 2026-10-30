@@ -11,6 +11,8 @@ const CONFIG = {
         roles: ['CISO', 'Engineer', 'Hunter', 'Analyst', 'Admin', 'Architect', 'Forensics', 'IR', 'Manager']
     },
     bgColors: ['#4da667', '#f6cf64', '#a9accd', '#e0e0e0'],
+    // Ink colours for the Line and Ink styles (first is the default)
+    inkColors: ['#2b3fbf', '#1e2430', '#c2353b', '#1d7a4c', '#6a3fd0', '#d4600f'],
 
     // AI persona generation (Gemini). The key is entered in the UI and kept in
     // this browser's localStorage only — it is never written to the repo.
@@ -23,20 +25,21 @@ Constraint: Each name must be a SINGLE WORD (e.g., "Hacker", "Doctor", "Analyst"
     }
 };
 
-// Default roster — `id` maps to assets/roster/<id>_<business|party>.svg
+// Default roster — `id` maps to assets/roster/<id>_<business|party>.svg;
+// `seed` picks the generated face (Line, Ink and Pixel styles)
 const INITIAL_ROSTER = [
-    { role: "CISO", id: "CISO" },
-    { role: "Engineer", id: "Engineer" },
-    { role: "Hunter", id: "Hunter" },
-    { role: "Investigator", id: "Investigator" },
-    { role: "Manager", id: "Manager" },
-    { role: "Analyst", id: "Analyst_Sr" },
-    { role: "Developer", id: "Developer" },
-    { role: "Admin", id: "Admin" },
-    { role: "Analyst", id: "Analyst_Jr" },
-    { role: "Architect", id: "Architect" },
-    { role: "Forensics", id: "Forensics" },
-    { role: "IR", id: "IR" }
+    { role: "CISO", id: "CISO", seed: "CISO60" },
+    { role: "Engineer", id: "Engineer", seed: "Engineer229" },
+    { role: "Hunter", id: "Hunter", seed: "Hunter259" },
+    { role: "Investigator", id: "Investigator", seed: "Investigator1631" },
+    { role: "Manager", id: "Manager", seed: "Manager85" },
+    { role: "Analyst", id: "Analyst_Sr", seed: "Analyst_Sr78" },
+    { role: "Developer", id: "Developer", seed: "Developer1182" },
+    { role: "Admin", id: "Admin", seed: "Admin0" },
+    { role: "Analyst", id: "Analyst_Jr", seed: "Analyst_Jr411" },
+    { role: "Architect", id: "Architect", seed: "Architect1129" },
+    { role: "Forensics", id: "Forensics", seed: "Forensics243" },
+    { role: "IR", id: "IR", seed: "IR522" }
 ];
 
 const state = {
@@ -46,6 +49,7 @@ const state = {
     shadows: false,
     isPaused: false,
     copyFormat: 'png',
-    avatarStyle: 'avataaars',   // 'avataaars' (local SVGs) | 'pixel' (generated)
+    avatarStyle: 'avataaars',   // 'avataaars' (local SVGs) | 'line' | 'ink' (line-art.js) | 'pixel' (generated)
+    ink: '#2b3fbf',             // board-wide ink for line/ink; a card's data-ink overrides it
     dragEl: null
 };

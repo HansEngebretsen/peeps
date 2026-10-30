@@ -10,6 +10,7 @@ A static HTML/CSS/JS app for generating and managing security role avatars ("pee
   - `config.js` — `CONFIG`, `INITIAL_ROSTER`, global `state`, AI settings.
   - `avatars.js` — resolves an avatar's image (local SVGs or pixel art).
   - `pixel-art.js` — deterministic pixel-art SVG generator.
+  - `line-art.js` — deterministic one-ink line-art SVG generator (Line and Ink styles share its parts).
   - `export.js` — PNG card rendering, clipboard copy, zip download.
   - `confetti.js` — party-mode confetti.
   - `ai.js` — Gemini persona generation (API key kept in browser localStorage).

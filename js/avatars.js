@@ -17,12 +17,25 @@ function getAvatarSrc(id, isParty) {
     return `assets/roster/${id}_${mode}.svg`;
 }
 
+const isLineStyle = () => state.avatarStyle === 'line' || state.avatarStyle === 'ink';
+const getShape = () => document.body.classList.contains('shape-circle') ? 'circle' : 'oval';
+const inkFor = (wrap) => wrap.dataset.ink || state.ink;
+
+// Options for buildLineSVG for a wrap in the current style/mode
+function lineOptions(wrap, size) {
+    return { variant: state.avatarStyle, ink: inkFor(wrap), party: state.partyMode, shape: getShape(), size };
+}
+
 function getViewType() {
     return document.body.getAttribute('data-view') || 'full';
 }
 
 // Returns { src, transform } for a wrap in the current global style/mode
 function resolveAvatarImage(wrap) {
+    if (isLineStyle()) {
+        if (!wrap.dataset.seed) wrap.dataset.seed = newSeed(wrap.querySelector('.role-label')?.innerText);
+        return { src: lineDataUrl(wrap.dataset.seed, lineOptions(wrap)), transform: '' };
+    }
     if (state.avatarStyle === 'pixel') {
         if (!wrap.dataset.seed) wrap.dataset.seed = newSeed(wrap.querySelector('.role-label')?.innerText);
         const view = getViewType();
