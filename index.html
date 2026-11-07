@@ -10,6 +10,24 @@
 <link href="css/styles.css?v=2" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+<!-- Google Analytics: page address only, so nothing kept in the URL reaches Google -->
+<script>
+(function () {
+  if (location.hostname !== 'haaans.com') return;
+  window.dataLayer = window.dataLayer || [];
+  window.gtag = function () { dataLayer.push(arguments); };
+  gtag('js', new Date());
+  gtag('config', 'G-MGSJYZJ5YJ', {
+    content_group: 'peeps',
+    page_location: location.origin + location.pathname,
+    page_referrer: document.referrer.split(/[?#]/)[0]
+  });
+  var s = document.createElement('script');
+  s.async = true;
+  s.src = 'https://www.googletagmanager.com/gtag/js?id=G-MGSJYZJ5YJ';
+  document.head.appendChild(s);
+})();
+</script>
 </head>
 <body class="shape-oval" data-theme="clean" data-view="full">
 <canvas id="confetti-canvas"></canvas>
