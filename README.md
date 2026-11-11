@@ -11,11 +11,13 @@ Illustrated personas for slides and docs. Name them, restyle them, and copy them
 
 
 <p align="center">
+<a href="demos/hero@zoom.avif">
 <picture>
 <source media="(min-width: 1024px)" type="image/avif" srcset="demos/hero@2x.avif">
 <source type="image/avif" srcset="demos/hero.avif">
 <img src="demos/hero.gif" alt="app" width="500">
 </picture>
+</a>
 </p>
 
 ## Features
@@ -27,20 +29,24 @@ Illustrated personas for slides and docs. Name them, restyle them, and copy them
 <p>Click a persona to copy it as a PNG. Settings switches the format to SVG, and Download All saves the whole set as a zip.</p>
 </td>
 <td width="50%">
+<a href="demos/copy@zoom.avif">
 <picture>
 <source media="(min-width: 1024px)" type="image/avif" srcset="demos/copy@2x.avif">
 <source type="image/avif" srcset="demos/copy.avif">
 <img src="demos/copy.gif" alt="Copy any persona">
 </picture>
+</a>
 </td>
 </tr>
 <tr valign="top">
 <td width="50%">
+<a href="demos/add@zoom.avif">
 <picture>
 <source media="(min-width: 1024px)" type="image/avif" srcset="demos/add@2x.avif">
 <source type="image/avif" srcset="demos/add.avif">
 <img src="demos/add.gif" alt="Add and name personas">
 </picture>
+</a>
 </td>
 <td width="50%">
 <h3>Add and name personas</h3>
@@ -62,11 +68,13 @@ Illustrated personas for slides and docs. Name them, restyle them, and copy them
 </tr>
 <tr valign="top">
 <td width="50%">
+<a href="demos/pixel@zoom.avif">
 <picture>
 <source media="(min-width: 1024px)" type="image/avif" srcset="demos/pixel@2x.avif">
 <source type="image/avif" srcset="demos/pixel.avif">
 <img src="demos/pixel.gif" alt="Switch to pixel art">
 </picture>
+</a>
 </td>
 <td width="50%">
 <h3>Switch to pixel art</h3>
@@ -79,20 +87,24 @@ Illustrated personas for slides and docs. Name them, restyle them, and copy them
 <p>Choose circle or oval backgrounds and resize the whole set at once. Share copies a link to the current set and style.</p>
 </td>
 <td width="50%">
+<a href="demos/style@zoom.avif">
 <picture>
 <source media="(min-width: 1024px)" type="image/avif" srcset="demos/style@2x.avif">
 <source type="image/avif" srcset="demos/style.avif">
 <img src="demos/style.gif" alt="Set the shape and size">
 </picture>
+</a>
 </td>
 </tr>
 <tr valign="top">
 <td width="50%">
+<a href="demos/party@zoom.avif">
 <picture>
 <source media="(min-width: 1024px)" type="image/avif" srcset="demos/party@2x.avif">
 <source type="image/avif" srcset="demos/party.avif">
 <img src="demos/party.gif" alt="Party mode and dark mode">
 </picture>
+</a>
 </td>
 <td width="50%">
 <h3>Party mode and dark mode</h3>
