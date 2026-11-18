@@ -50,7 +50,7 @@ Illustrated personas for slides and docs. Name them, restyle them, and copy them
 </td>
 <td width="50%">
 <h3>Add and name personas</h3>
-<p>The + button adds a persona and selects its label so you can type a role. The sparkle button can also generate a full set from a description, using Chrome's on-device model, or your own Gemini API key if that isn't available.</p>
+<p>The + button adds a persona and selects its label so you can type a role. The sparkle button can also generate a full set from a description, using Chrome's on-device model, or your own Gemini API key for faster results.</p>
 </td>
 </tr>
 <tr valign="top">
