@@ -11,7 +11,7 @@ const CONFIG = {
         roles: ['CISO', 'Engineer', 'Hunter', 'Analyst', 'Admin', 'Architect', 'Forensics', 'IR', 'Manager']
     },
     bgColors: ['#4da667', '#f6cf64', '#a9accd', '#e0e0e0'],
-    // Ink colours for the Line and Ink styles (first is the default)
+    // Ink colours for the Ink style (first is the default)
     inkColors: ['#2b3fbf', '#1e2430', '#c2353b', '#1d7a4c', '#6a3fd0', '#d4600f'],
 
     // AI persona generation (Gemini). The key is entered in the UI and kept in
@@ -26,7 +26,7 @@ Constraint: Each name must be a SINGLE WORD (e.g., "Hacker", "Doctor", "Analyst"
 };
 
 // Default roster — `id` maps to assets/roster/<id>_<business|party>.svg;
-// `seed` picks the generated face (Line, Ink and Pixel styles)
+// `seed` picks the generated face (Ink and Pixel styles)
 const INITIAL_ROSTER = [
     { role: "CISO", id: "CISO", seed: "CISO60" },
     { role: "Engineer", id: "Engineer", seed: "Engineer229" },
@@ -49,7 +49,8 @@ const state = {
     shadows: false,
     isPaused: false,
     copyFormat: 'png',
-    avatarStyle: 'avataaars',   // 'avataaars' (local SVGs) | 'line' | 'ink' (line-art.js) | 'pixel' (generated)
-    ink: '#2b3fbf',             // board-wide ink for line/ink; a card's data-ink overrides it
+    labelSizeSet: false,        // font slider used; until then labels scale with the avatars
+    avatarStyle: 'avataaars',   // 'avataaars' (local SVGs) | 'ink' (line-art.js) | 'pixel' (generated)
+    ink: '#2b3fbf',             // board-wide ink for the Ink style; a card's data-ink overrides it
     dragEl: null
 };

@@ -1,7 +1,7 @@
-# Project Context: Security Avatars Studio
+# Project Context: Peeps
 
 ## Overview
-A static HTML/CSS/JS app for generating and managing security role avatars ("peeps").
+A static HTML/CSS/JS app for making illustrated personas ("peeps") for slides and docs.
 
 ## Architecture
 - `index.html` — markup only.
@@ -10,10 +10,10 @@ A static HTML/CSS/JS app for generating and managing security role avatars ("pee
   - `config.js` — `CONFIG`, `INITIAL_ROSTER`, global `state`, AI settings.
   - `avatars.js` — resolves an avatar's image (local SVGs or pixel art).
   - `pixel-art.js` — deterministic pixel-art SVG generator.
-  - `line-art.js` — deterministic one-ink line-art SVG generator (Line and Ink styles share its parts).
+  - `line-art.js` — deterministic one-ink line-art SVG generator (powers the Ink style).
   - `export.js` — PNG card rendering, clipboard copy, zip download.
   - `confetti.js` — party-mode confetti.
-  - `ai.js` — Gemini persona generation (API key kept in browser localStorage).
+  - `ai.js` — persona generation — Chrome's on-device model (Prompt API) by default, Gemini API key as fallback (kept in browser localStorage).
   - `share.js` — share-link serialise/restore (`?data=`).
   - `app.js` — grid, avatar cards, controls, init.
 - `assets/` — pre-downloaded avatar SVGs (`roster/`, `random_business/`, `random_party/`).

@@ -17,7 +17,7 @@ function getAvatarSrc(id, isParty) {
     return `assets/roster/${id}_${mode}.svg`;
 }
 
-const isLineStyle = () => state.avatarStyle === 'line' || state.avatarStyle === 'ink';
+const isLineStyle = () => state.avatarStyle === 'ink';
 const getShape = () => document.body.classList.contains('shape-circle') ? 'circle' : 'oval';
 const inkFor = (wrap) => wrap.dataset.ink || state.ink;
 

@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Security Avatars Studio — styles
+   Peeps — styles
    ========================================================================== */
 
 :root {
@@ -30,7 +30,9 @@
 
     /* Avatar Specs (Dynamic) */
     --avatar-size: 120px;
-    --label-size: 13px;
+    --avatar-unit: calc(var(--avatar-size) / 120);          /* 1px at the default avatar size */
+    --label-size: calc(var(--avatar-unit) * 13);            /* follows the avatars until the font slider sets it */
+    --ink-stroke: calc(var(--avatar-size) * 3.4 / 206);     /* the line art's stroke (line-art.js) at this size */
     --avatar-bg-shape-w: 90%;
     --avatar-bg-shape-h: 80%;
     --avatar-shadow: none;
@@ -135,7 +137,8 @@ body.party-active #confetti-canvas { opacity: 1; }
 
 .top-bar .icon-btn.active { color: var(--ui-accent); transform: scale(1.05); }
 .top-bar .icon-btn#partyBtn.active { color: #8b5cf6; }
-.top-bar .icon-btn#generateBtn.active { color: #f59e0b; }
+.top-bar .icon-btn#generateBtn.active { color: var(--ui-text); background: rgba(0,0,0,0.05); }
+.dark-mode .top-bar .icon-btn#generateBtn.active { background: rgba(255,255,255,0.08); }
 
 /* --- Grid --- */
 .imgs {
@@ -164,10 +167,7 @@ body.party-active #confetti-canvas { opacity: 1; }
 }
 .loader-icon {
     font-size: 48px;
-    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
+    color: var(--ui-icon);
     animation: spin-pulse 1.5s infinite ease-in-out;
     margin-bottom: 16px;
     display: block;
@@ -293,11 +293,11 @@ body.pixel-theme .img-wrap img {
 body.pixel-theme .role-label {
     font-family: 'VT323', monospace;
     border-radius: 0;
-    font-size: calc(var(--label-size) + 3px);
+    font-size: calc(var(--label-size) * 1.23);
     text-transform: uppercase;
-    border: 2px solid rgba(255,255,255,0.8);
-    box-shadow: 4px 4px 0px rgba(0,0,0,0.1);
-    padding: 4px 10px;
+    border: calc(var(--avatar-unit) * 2) solid rgba(255,255,255,0.8);
+    box-shadow: calc(var(--avatar-unit) * 4) calc(var(--avatar-unit) * 4) 0px rgba(0,0,0,0.1);
+    padding: 0.25em 0.62em;
 }
 body.pixel-theme .img-wrap::before { border-radius: 0 !important; }
 body.pixel-theme .add-card::after  { border-radius: 0; }
@@ -315,13 +315,18 @@ body.line-theme .img-wrap img {
 body.line-theme .role-label {
     background: #ffffff;
     color: var(--ink);
-    border: 2px solid var(--ink);
+    /* an inset shadow, not a border: browsers round borders down to whole pixels,
+       which would break the match with the art's stroke */
+    border: none;
+    box-shadow: inset 0 0 0 var(--ink-stroke) var(--ink);
     border-radius: 999px;
-    box-shadow: none;
-    bottom: -2px;
-    padding: 2px 9px;
+    bottom: calc(var(--avatar-unit) * -2);
+    padding: calc(0.15em + var(--ink-stroke)) calc(0.7em + var(--ink-stroke));
 }
 body.line-theme .role-label:focus { background: #ffffff; }
+/* Ink style: badges are solid too */
+body.ink-theme .role-label,
+body.ink-theme .role-label:focus { background: var(--ink); color: #ffffff; }
 
 /* Ink swatches */
 .control-group[hidden] { display: none; }
@@ -349,14 +354,16 @@ body.pixel-theme[data-view="full"] .img-wrap::before {
     transform: translateX(-50%) scale(0.5);
 }
 body.pixel-theme[data-view="full"] .role-label {
-    bottom: -38px;
+    bottom: calc(var(--avatar-unit) * -38);
     background: var(--ui-panel-bg);
-    border: 2px solid var(--ui-border);
+    border: calc(var(--avatar-unit) * 2) solid var(--ui-border);
     border-radius: 0;
-    box-shadow: 4px 4px 0px rgba(0,0,0,0.1);
+    box-shadow: calc(var(--avatar-unit) * 4) calc(var(--avatar-unit) * 4) 0px rgba(0,0,0,0.1);
     color: var(--ui-text);
-    padding: 6px 14px;
+    padding: 0.375em 0.875em;
 }
+/* full-body labels hang below the sprite, so the rows open up as they grow */
+body.pixel-theme[data-view="full"] .imgs { row-gap: calc(var(--avatar-unit) * 60); }
 body.pixel-theme[data-view="head"] {
     --avatar-bg-shape-w: 100%;
     --avatar-bg-shape-h: 100%;
@@ -367,16 +374,16 @@ body.pixel-theme[data-view="head"] {
     background-color: var(--avatar-bg);
     color: rgba(0, 0, 0, 0.6);
     font-weight: bold;
-    box-shadow: 0px 1px 2px 1px rgba(0, 0, 0, 0.14);
-    border: 1px solid rgba(255, 255, 255, 0.5);
+    box-shadow: inset 0 0 0 var(--avatar-unit) rgba(255, 255, 255, 0.5),
+                0px var(--avatar-unit) calc(var(--avatar-unit) * 2) var(--avatar-unit) rgba(0, 0, 0, 0.14);
     font-size: var(--label-size);
     text-transform: uppercase;
     letter-spacing: 0.1em;
     position: absolute;
-    bottom: 6px;
+    bottom: calc(var(--avatar-unit) * 6);
     left: 50%;
-    padding: 2px 6px;
-    border-radius: 4px;
+    padding: calc(0.15em + var(--avatar-unit)) calc(0.46em + var(--avatar-unit));
+    border-radius: 0.3em;
     z-index: 12;
     transform: translateX(-50%);
     transition: 0.15s var(--ease-snappy);
@@ -385,8 +392,8 @@ body.pixel-theme[data-view="head"] {
     text-align: center;
     line-height: 1.1;
     width: auto;
-    min-width: 60px;
-    max-width: 140px;
+    min-width: 4.6em;
+    max-width: 10.8em;
     max-height: 2.4em;
     overflow: hidden;
     display: -webkit-box;
@@ -476,18 +483,17 @@ body.view-mode .footer-info { display: none; }
     background: var(--ui-panel-bg);
     border-top: 1px solid var(--ui-border);
     padding: 16px 24px;
-    /* the controls and the settings/⋮ buttons sit together as one centered row; once they
-       don't fit, the controls' track shrinks and scrolls, so the row starts at the left */
-    display: flex; justify-content: center; align-items: center; gap: var(--bar-gap);
+    /* controls run from the left and the ⋮/settings buttons are pinned to the right, so
+       switching styles never moves the style toggle or settings */
+    display: flex; align-items: center; gap: var(--bar-gap);
     z-index: 90; backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
 }
 body.view-mode .bottom-bar { display: none; }
 
-/* The track scrolls sideways when the controls don't fit. Its inner row has auto side margins:
-   centered while there's room, and pinned to the left (overflowing to the right) once there isn't. */
+/* The track takes the free room and scrolls sideways when the controls don't fit. */
 .bar-scroll {
-    flex: 0 1 auto; min-width: 0;
+    flex: 1 1 auto; min-width: 0;
     overflow-x: auto; overflow-y: hidden;
     scrollbar-width: none; overscroll-behavior-x: contain;
     /* soft fade on the right edge hints there's more to scroll */
@@ -498,9 +504,9 @@ body.view-mode .bottom-bar { display: none; }
 .bar-scroll::-webkit-scrollbar { display: none; }
 .bar-inner {
     display: flex; align-items: center; gap: var(--bar-gap);
-    width: max-content; margin: 0 auto; padding: 2px 0;
+    width: max-content; padding: 2px 0;
 }
-.bar-end { display: flex; align-items: center; gap: 2px; flex-shrink: 0; margin-left: calc(4px - var(--bar-gap) / 2); }
+.bar-end { display: flex; align-items: center; gap: 2px; flex-shrink: 0; }
 
 /* the size slider is its own group so it can fold away alone, but it sits with Shape/View in the bar */
 .bar-inner > .size-group { margin-left: calc(12px - var(--bar-gap)); }
@@ -509,7 +515,7 @@ body.view-mode .bottom-bar { display: none; }
 .control-group { display: flex; align-items: center; gap: 12px; }
 .group-label {
     font-size: 11px; font-weight: 700; text-transform: uppercase;
-    color: var(--ui-label); letter-spacing: 0.05em; min-width: 30px;
+    color: var(--ui-label); letter-spacing: 0.05em; min-width: 42px;
 }
 
 /* Segmented Control */
@@ -559,18 +565,13 @@ input[type=range]::-moz-range-track { height: 4px; background: rgba(0,0,0,0.1); 
 
 /* Animation Pause Button */
 .anim-btn {
-    width: 36px; height: 36px;
-    border: 2px solid var(--ui-border);
-    border-radius: 50%;
-    background: transparent;
+    background: none; border: none; padding: 6px;
     color: var(--ui-icon);
     cursor: pointer;
     display: flex; align-items: center; justify-content: center;
-    transition: all 0.15s ease;
+    transition: color 0.15s ease;
 }
-.anim-btn:hover { color: var(--ui-text); background: rgba(0,0,0,0.04); }
-.anim-btn.paused { color: var(--ui-accent); border-color: var(--ui-accent); }
-.anim-btn .material-symbols-outlined { font-size: 20px; }
+.anim-btn:hover { color: var(--ui-text); }
 
 /* Settings Button */
 .settings-wrap { position: relative; }
@@ -615,9 +616,12 @@ input[type=range]::-moz-range-track { height: 4px; background: rgba(0,0,0,0.1); 
 body.dark-mode .bar-end .popover { background: #1e293b; }
 
 /* --- Responsive: shrink first, then fold extras into •••, then scroll --- */
+@media (max-width: 1360px) {
+    .bottom-bar { --bar-gap: 24px; }
+    .slider-control { width: 104px; }
+}
 @media (max-width: 1100px) {
     .bottom-bar { --bar-gap: 22px; }
-    .slider-control { width: 120px; }
 }
 @media (max-width: 900px) {
     .bottom-bar { padding: 12px 16px; }
@@ -641,33 +645,85 @@ body.dark-mode .bar-end .popover { background: #1e293b; }
         padding: 4px 12px; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
     }
     .settings-popover, .more-popover { right: -4px; }
+    body .generator-popover { top: 62px; right: 12px; left: 12px; width: auto; }
 }
 
+/* --- AI generator: same surface and controls as the bar's popovers --- */
 .generator-popover {
-    position: fixed;
-    top: 72px;
-    right: 32px;
-    width: 260px;
+    position: fixed; top: 72px; right: 32px; width: 288px;
+    padding: 14px;
+    background: #ffffff;
+    transform: translateY(-6px);
 }
+.generator-popover.active { transform: translateY(0); }
+body.dark-mode .generator-popover { background: #1e293b; }
 
-.gen-label {
-    font-size: 12px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: var(--ui-label);
-    display: block;
-    margin-bottom: 8px;
+.gen-step { display: flex; flex-direction: column; gap: 10px; }
+.gen-step[hidden] { display: none; }
+.generator-popover input[type="text"],
+.generator-popover input[type="password"] { margin: 0; }
+
+.gen-msg { margin: 0; font-size: 13px; font-weight: 600; line-height: 1.4; color: var(--ui-text); }
+.gen-fine { margin: 0; font-size: 11px; line-height: 1.45; color: var(--ui-label); }
+.gen-fine:empty { display: none; }
+
+.gen-links { display: flex; align-items: center; gap: 14px; }
+.gen-links a, .gen-link, .gen-fine button {
+    background: none; border: none; padding: 0; cursor: pointer; font-family: inherit;
+    font-size: 12px; font-weight: 600; color: var(--ui-accent); text-decoration: none;
 }
-.gen-key-row { margin-bottom: 4px; }
-.gen-key-row.hidden { display: none; }
-.gen-key-hint { font-size: 11px; color: var(--ui-label); margin: -10px 0 14px; line-height: 1.4; }
-.gen-key-hint a { color: var(--ui-accent); }
-.gen-key-reset {
-    display: block; margin-top: 10px; text-align: center;
-    font-size: 11px; color: var(--ui-label); cursor: pointer; text-decoration: underline;
+.gen-fine button { font-size: inherit; }
+.gen-links a:hover, .gen-link:hover, .gen-fine button:hover { text-decoration: underline; }
+.gen-link[hidden] { display: none; }
+#genKeyBack { margin-left: auto; color: var(--ui-label); }
+
+/* key input with an inline save arrow */
+.gen-field { position: relative; }
+.gen-field input { padding-right: 40px; }
+.gen-go {
+    position: absolute; top: 50%; right: 4px; transform: translateY(-50%);
+    width: 30px; height: 30px; padding: 0;
+    display: flex; align-items: center; justify-content: center;
+    background: none; border: none; border-radius: 4px; cursor: pointer;
+    color: var(--ui-icon);
+    transition: color 0.15s ease, background 0.15s ease;
 }
-.gen-key-reset.hidden { display: none; }
+.gen-go .material-symbols-outlined { font-size: 20px; }
+.gen-go:hover { background: rgba(0,0,0,0.05); color: var(--ui-text); }
+.dark-mode .gen-go:hover { background: rgba(255,255,255,0.08); }
+.gen-field input:not(:placeholder-shown) + .gen-go { color: var(--ui-accent); }
+
+/* the amount slider sits against the button it drives, which says the number */
+.gen-make {
+    display: flex; align-items: center; gap: 12px;
+}
+.gen-make input[type=range] { flex: 1; min-width: 0; }
+.gen-btn {
+    flex-shrink: 0; min-width: 116px;
+    padding: 8px 12px;
+    background: var(--ui-accent); color: #ffffff;
+    border: none; border-radius: 6px; cursor: pointer;
+    font-family: inherit; font-size: 13px; font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    transition: filter 0.15s ease, transform 0.1s ease;
+}
+.gen-btn:hover { filter: brightness(1.08); }
+.gen-btn:active { transform: scale(0.97); }
+.gen-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* Gemini key in Settings */
+.key-field { position: relative; width: 130px; }
+.key-field input[type="password"], .key-field input[type="text"] {
+    margin: 0; width: 100%; padding: 6px 28px 6px 8px; font-size: 12px;
+}
+.key-eye {
+    position: absolute; top: 50%; right: 2px; transform: translateY(-50%);
+    width: 24px; height: 24px; padding: 0;
+    display: flex; align-items: center; justify-content: center;
+    background: none; border: none; cursor: pointer; color: var(--ui-icon);
+}
+.key-eye .material-symbols-outlined { font-size: 16px; }
+.key-eye:hover { color: var(--ui-text); }
 
 .setting-row {
     display: flex; justify-content: space-between; align-items: center;
@@ -704,35 +760,6 @@ select {
     background-size: 5px 5px, 5px 5px;
     background-repeat: no-repeat;
 }
-
-.gen-btn {
-    width: 100%;
-    padding: 10px;
-    background: var(--ui-text);
-    color: var(--ui-active-bg);
-    border: none; border-radius: 6px;
-    cursor: pointer;
-    font-weight: 600;
-    font-size: 13px;
-    font-family: inherit;
-    transition: all 0.15s ease;
-}
-.gen-btn:hover {
-    transform: translateY(-1px);
-    opacity: 0.9;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-}
-.gen-btn:active { transform: translateY(0); }
-.gen-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-
-.input-group-row { display: flex; gap: 8px; align-items: center; margin-bottom: 16px; }
-.input-group-row input[type=range] { flex: 1; }
-.input-group-row .count-val {
-    font-size: 13px; font-weight: 600;
-    min-width: 20px; text-align: right;
-    color: var(--ui-text);
-}
-.input-group-row .slider-label { font-size: 12px; font-weight: 600; color: var(--ui-label); }
 
 .switch {
     width: 32px; height: 18px; background: #ccc; border-radius: 18px; position: relative; cursor: pointer;

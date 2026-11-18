@@ -183,13 +183,14 @@ function setupToggle(id, callback) {
     });
 }
 
-const STYLE_NAMES = { avataaars: 'Modern', line: 'Line', ink: 'Ink', pixel: 'Pixel Art' };
+const STYLE_NAMES = { avataaars: 'Modern', ink: 'Ink', pixel: 'Pixel Art' };
 
 setupToggle('styleControl', (val) => {
     state.avatarStyle = val;
     const isPixel = val === 'pixel';
     document.body.classList.toggle('pixel-theme', isPixel);
     document.body.classList.toggle('line-theme', isLineStyle());
+    document.body.classList.toggle('ink-theme', val === 'ink');
     const inkGroup = document.getElementById('inkGroup');
     if (inkGroup) inkGroup.hidden = !isLineStyle();
     document.getElementById('shapeControl').style.display = isPixel ? 'none' : 'flex';
@@ -206,7 +207,7 @@ setupToggle('shapeControl', (val) => {
     if (isLineStyle()) updateAllImages();   // line styles draw their own frame
 });
 
-// --- Ink colour (Line and Ink styles) --------------------------------------
+// --- Ink colour (Ink style) --------------------------------------
 function setCardInk(wrap, ink) {
     if (ink) wrap.dataset.ink = ink; else delete wrap.dataset.ink;
     if (ink) wrap.style.setProperty('--ink', ink); else wrap.style.removeProperty('--ink');
@@ -282,6 +283,14 @@ function addSlideListeners(slider, cssVar) {
 addSlideListeners(document.getElementById('sizeSlider'), '--avatar-size');
 addSlideListeners(document.getElementById('fontSlider'), '--label-size');
 
+// Until the text size is set by hand, its slider tracks the size the labels are scaling to
+function syncFontSlider() {
+    if (state.labelSizeSet) return;
+    document.getElementById('fontSlider').value = Math.round(document.getElementById('sizeSlider').value * 13 / 120);
+}
+document.getElementById('sizeSlider').addEventListener('input', syncFontSlider);
+document.getElementById('fontSlider').addEventListener('input', () => { state.labelSizeSet = true; });
+
 function updateShadows() {
     let value = 'none';
     if (state.shadows) {
@@ -322,6 +331,13 @@ function checkEditTrigger() {
     if (state.viewMode) setViewMode(false);
 }
 document.getElementById('siteTitle').addEventListener('dblclick', checkEditTrigger);
+
+// The tab is named after the board: "Peeps", or "Fintech · Peeps" once it's renamed
+function syncDocTitle() {
+    const t = document.getElementById('siteTitle').textContent.trim();
+    document.title = !t || /^peeps$/i.test(t) ? 'Peeps' : `${t} · Peeps`;
+}
+document.getElementById('siteTitle').addEventListener('input', syncDocTitle);
 grid.addEventListener('dblclick', (e) => {
     if (e.target.classList.contains('role-label')) checkEditTrigger();
 });
@@ -331,7 +347,6 @@ function toggleAnimation() {
     state.isPaused = !state.isPaused;
     document.body.classList.toggle('animations-paused', state.isPaused);
     document.getElementById('pauseIcon').textContent = state.isPaused ? 'play_arrow' : 'pause';
-    document.getElementById('pauseBtn').classList.toggle('paused', state.isPaused);
     showToast(state.isPaused ? "Animations Paused" : "Animations Resumed");
 }
 document.getElementById('pauseBtn').onclick = toggleAnimation;
@@ -448,5 +463,6 @@ initAIGenerator({ onRoles: renderNewBatch });
     grid.appendChild(addCard);
     roster.forEach((d, i) => grid.insertBefore(createAvatar(d, i), addCard));
 
+    syncDocTitle();
     if (error) showToast("Error loading shared config");
 })();

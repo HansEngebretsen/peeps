@@ -26,7 +26,7 @@ function getShareState() {
             viewMode: true,
             shape: document.body.classList.contains('shape-circle') ? 'circle' : 'oval',
             size: document.getElementById('sizeSlider').value,
-            fontSize: document.getElementById('fontSlider').value,
+            fontSize: state.labelSizeSet ? document.getElementById('fontSlider').value : undefined,
             canvasTheme: document.body.getAttribute('data-theme') || 'clean',
             shadowColor: document.getElementById('shadowColorPicker').value,
             hideLabels: document.body.classList.contains('hide-labels')
@@ -73,11 +73,15 @@ function readSharedState() {
     if (data.title) document.getElementById('siteTitle').innerText = data.title;
 
     const s = data.settings || {};
-    const size = s.size || 120, fontSize = s.fontSize || 13;
+    const size = s.size || 120;
     document.getElementById('sizeSlider').value = size;
     document.documentElement.style.setProperty('--avatar-size', size + 'px');
-    document.getElementById('fontSlider').value = fontSize;
-    document.documentElement.style.setProperty('--label-size', fontSize + 'px');
+    if (s.fontSize) {
+        state.labelSizeSet = true;
+        document.getElementById('fontSlider').value = s.fontSize;
+        document.documentElement.style.setProperty('--label-size', s.fontSize + 'px');
+    }
+    syncFontSlider();
 
     if (s.canvasTheme) {
         document.getElementById('bgThemeSelect').value = s.canvasTheme;
@@ -86,7 +90,7 @@ function readSharedState() {
     if (s.shadowColor) document.getElementById('shadowColorPicker').value = s.shadowColor;
 
     if (s.ink) setInk(s.ink, { silent: true });
-    if (s.style) clickOpt('styleControl', s.style);
+    if (s.style) clickOpt('styleControl', s.style === 'line' ? 'ink' : s.style);   // Line style was retired; old links get Ink
     if (s.view) clickOpt('viewControl', s.view);
     if (s.darkMode) setDarkMode(true);
     if (s.shape) clickOpt('shapeControl', s.shape);

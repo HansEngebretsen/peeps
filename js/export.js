@@ -33,25 +33,40 @@ async function getAvatarSvgText(wrap, size) {
     return r.text();
 }
 
-// Line styles: a paper pill outlined and lettered in the ink
-function drawInkBadge(ctx, ink, text, cx, size) {
-    const fontSize = 54;
+// Line styles: a pill matching the on-screen label and the art's stroke.
+// Line is paper lettered in the ink; Ink is solid ink lettered in paper.
+function drawInkBadge(ctx, wrap, text, cx, size) {
+    const ink = inkFor(wrap);
+    const solid = state.avatarStyle === 'ink';
+    const stroke = size * LINE_STROKE / 206;
+    const toExport = size / document.getElementById('sizeSlider').value;
+    let fontSize = parseFloat(getComputedStyle(wrap.querySelector('.role-label')).fontSize) * toExport;
+
     ctx.save();
-    ctx.font = `bold ${fontSize}px sans-serif`;
     ctx.textBaseline = 'middle';
     ctx.textAlign = 'center';
-    const badgeW = ctx.measureText(text).width + 80;
-    const badgeH = fontSize + 36;
-    const badgeY = size - badgeH - 12;
+    const setFont = () => {
+        ctx.font = `bold ${fontSize}px sans-serif`;
+        ctx.letterSpacing = `${fontSize * 0.1}px`;
+    };
+    setFont();
+    // Long names run past the card on screen; keep them on the canvas
+    const room = size - stroke;
+    const needed = ctx.measureText(text).width + fontSize * 1.4;
+    if (needed > room) { fontSize *= room / needed; setFont(); }
+
+    const badgeW = ctx.measureText(text).width + fontSize * 1.4;
+    const badgeH = fontSize * 1.4;
+    const badgeY = size - badgeH - stroke / 2;
     ctx.beginPath();
     ctx.roundRect(cx - badgeW / 2, badgeY, badgeW, badgeH, badgeH / 2);
-    ctx.fillStyle = '#ffffff';
+    ctx.fillStyle = solid ? ink : LINE_PAPER;
     ctx.fill();
-    ctx.lineWidth = 9;
+    ctx.lineWidth = stroke;
     ctx.strokeStyle = ink;
     ctx.stroke();
-    ctx.fillStyle = ink;
-    ctx.fillText(text, cx, badgeY + badgeH / 2 + 3);
+    ctx.fillStyle = solid ? LINE_PAPER : ink;
+    ctx.fillText(text, cx, badgeY + badgeH / 2 + fontSize * 0.05);
     ctx.restore();
 }
 
@@ -177,7 +192,7 @@ async function generateCardBlob(wrap) {
     // 4. Label badge
     const roleText = wrap.querySelector('.role-label').innerText.trim().toUpperCase();
     if (roleText && !document.body.classList.contains('hide-labels')) {
-        if (isLineStyle()) drawInkBadge(ctx, inkFor(wrap), roleText, cx, size);
+        if (isLineStyle()) drawInkBadge(ctx, wrap, roleText, cx, size);
         else drawBadge(ctx, wrapBg, roleText, cx, size, isPixel);
     }
 
@@ -225,7 +240,7 @@ async function downloadAll() {
         }
         showToast("Zipping...");
         const zipBlob = await zip.generateAsync({ type: "blob" });
-        saveAs(zipBlob, "security_personas.zip");
+        saveAs(zipBlob, "peeps.zip");
         showToast("Download Started");
     } catch (e) {
         console.error(e);
