@@ -132,10 +132,10 @@ body.party-active #confetti-canvas { opacity: 1; }
     color: var(--ui-icon);
     transition: transform 0.15s var(--ease-snappy), color 0.15s ease, background 0.15s ease;
 }
-.top-bar .icon-btn:hover { transform: scale(1.1); color: var(--ui-text); background: rgba(0,0,0,0.03); }
+.top-bar .icon-btn:hover { color: var(--ui-text); background: rgba(0,0,0,0.03); }
 .dark-mode .top-bar .icon-btn:hover { background: rgba(255,255,255,0.05); }
 
-.top-bar .icon-btn.active { color: var(--ui-accent); transform: scale(1.05); }
+.top-bar .icon-btn.active { color: var(--ui-accent); }
 .top-bar .icon-btn#partyBtn.active { color: #8b5cf6; }
 .top-bar .icon-btn#generateBtn.active { color: var(--ui-text); background: rgba(0,0,0,0.05); }
 .dark-mode .top-bar .icon-btn#generateBtn.active { background: rgba(255,255,255,0.08); }
@@ -339,7 +339,6 @@ body.ink-theme .role-label:focus { background: var(--ink); color: #ffffff; }
     transition: transform 0.15s var(--ease-snappy), box-shadow 0.15s ease;
 }
 .dark-mode .ink-swatch { box-shadow: inset 0 0 0 1px rgba(255,255,255,0.3); }
-.ink-swatch:hover { transform: scale(1.12); }
 .ink-swatch.active, .dark-mode .ink-swatch.active { box-shadow: 0 0 0 2px var(--ui-active-bg), 0 0 0 4px var(--sw, var(--ui-text)); }
 /* Custom: a colour wheel until a custom ink is picked, then that colour */
 .ink-custom {
