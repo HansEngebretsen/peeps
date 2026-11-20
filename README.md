@@ -1,6 +1,6 @@
 # `peeps`
 
-Illustrated personas for slides and docs. Name them, restyle them, and copy them out as images.
+Quick generate, copy and paste UX personas. Name them, restyle them, and copy them out as images.
 
 
 <div align="center">
