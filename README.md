@@ -25,78 +25,38 @@ Quick generate, copy and paste UX personas. Name them, restyle them, and copy th
 <table>
 <tr valign="top">
 <td width="50%">
-<h3>Copy any persona</h3>
-<p>Click a persona to copy it as a PNG. Settings switches the format to SVG, and Download All saves the whole set as a zip.</p>
+<h3>Copy, add and name personas</h3>
+<p>Click a persona to copy it as a PNG. The + button adds one and selects its label so you can type a role, and the sparkle button can generate a whole set from a description, using Chrome's on-device model or your own Gemini API key.</p>
 </td>
 <td width="50%">
-<a href="demos/copy@zoom.avif">
+<a href="demos/copyadd@zoom.avif">
 <picture>
-<source media="(min-width: 1024px)" type="image/avif" srcset="demos/copy@2x.avif">
-<source type="image/avif" srcset="demos/copy.avif">
-<img src="demos/copy.gif" alt="Copy any persona">
+<source media="(min-width: 1024px)" type="image/avif" srcset="demos/copyadd@2x.avif">
+<source type="image/avif" srcset="demos/copyadd.avif">
+<img src="demos/copyadd.gif" alt="Copy, add and name personas">
 </picture>
 </a>
 </td>
 </tr>
 <tr valign="top">
 <td width="50%">
-<a href="demos/add@zoom.avif">
+<a href="demos/restyle@zoom.avif">
 <picture>
-<source media="(min-width: 1024px)" type="image/avif" srcset="demos/add@2x.avif">
-<source type="image/avif" srcset="demos/add.avif">
-<img src="demos/add.gif" alt="Add and name personas">
+<source media="(min-width: 1024px)" type="image/avif" srcset="demos/restyle@2x.avif">
+<source type="image/avif" srcset="demos/restyle.avif">
+<img src="demos/restyle.gif" alt="Shuffle, or restyle">
 </picture>
 </a>
 </td>
 <td width="50%">
-<h3>Add and name personas</h3>
-<p>The + button adds a persona and selects its label so you can type a role. The sparkle button can also generate a full set from a description, using Chrome's on-device model, or your own Gemini API key for faster results.</p>
+<h3>Shuffle, or restyle</h3>
 </td>
 </tr>
 <tr valign="top">
 <td width="50%">
-<h3>Change the face, color and name</h3>
-<p>Hover a persona for buttons to swap the face, cycle the background color, copy it or remove it. Click the label to rename it.</p>
+<h3>Party mode and dark mode</h3>
+<p>Party mode changes everyone's outfit and adds confetti. The moon icon in the top bar switches to dark mode.</p>
 </td>
-<td width="50%">
-<picture>
-<source media="(min-width: 1024px)" type="image/avif" srcset="demos/remix@2x.avif">
-<source type="image/avif" srcset="demos/remix.avif">
-<img src="demos/remix.gif" alt="Change the face, color and name">
-</picture>
-</td>
-</tr>
-<tr valign="top">
-<td width="50%">
-<a href="demos/pixel@zoom.avif">
-<picture>
-<source media="(min-width: 1024px)" type="image/avif" srcset="demos/pixel@2x.avif">
-<source type="image/avif" srcset="demos/pixel.avif">
-<img src="demos/pixel.gif" alt="Switch to pixel art">
-</picture>
-</a>
-</td>
-<td width="50%">
-<h3>Switch to pixel art</h3>
-<p>Pixel style redraws every persona as pixel art, shown full body or head only. Copying and downloading work the same way.</p>
-</td>
-</tr>
-<tr valign="top">
-<td width="50%">
-<h3>Set the shape and size</h3>
-<p>Choose circle or oval backgrounds and resize the whole set at once. Share copies a link to the current set and style.</p>
-</td>
-<td width="50%">
-<a href="demos/style@zoom.avif">
-<picture>
-<source media="(min-width: 1024px)" type="image/avif" srcset="demos/style@2x.avif">
-<source type="image/avif" srcset="demos/style.avif">
-<img src="demos/style.gif" alt="Set the shape and size">
-</picture>
-</a>
-</td>
-</tr>
-<tr valign="top">
 <td width="50%">
 <a href="demos/party@zoom.avif">
 <picture>
@@ -105,10 +65,6 @@ Quick generate, copy and paste UX personas. Name them, restyle them, and copy th
 <img src="demos/party.gif" alt="Party mode and dark mode">
 </picture>
 </a>
-</td>
-<td width="50%">
-<h3>Party mode and dark mode</h3>
-<p>Party mode changes everyone's outfit and adds confetti. The moon icon in the top bar switches to dark mode.</p>
 </td>
 </tr>
 </table>
