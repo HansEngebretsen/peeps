@@ -25,31 +25,32 @@ Quick generate, copy and paste UX personas. Name them, restyle them, and copy th
 <table>
 <tr valign="top">
 <td width="50%">
-<h3>Copy, add and name personas</h3>
-<p>Click a persona to copy it as a PNG. The + button adds one and selects its label so you can type a role, and the sparkle button can generate a whole set from a description, using Chrome's on-device model or your own Gemini API key.</p>
+<h3>One-click copy &amp; edit</h3>
+<p>Copy transparent PNGs and quickly change and customize appearance.</p>
 </td>
 <td width="50%">
 <a href="demos/copyadd@zoom.avif">
 <picture>
 <source media="(min-width: 1024px)" type="image/avif" srcset="demos/copyadd@2x.avif">
 <source type="image/avif" srcset="demos/copyadd.avif">
-<img src="demos/copyadd.gif" alt="Copy, add and name personas">
+<img src="demos/copyadd.gif" alt="One-click copy &amp; edit">
 </picture>
 </a>
 </td>
 </tr>
 <tr valign="top">
 <td width="50%">
-<a href="demos/restyle@zoom.avif">
+<a href="demos/generate@2x.avif">
 <picture>
-<source media="(min-width: 1024px)" type="image/avif" srcset="demos/restyle@2x.avif">
-<source type="image/avif" srcset="demos/restyle.avif">
-<img src="demos/restyle.gif" alt="Shuffle, or restyle">
+<source media="(min-width: 1024px)" type="image/avif" srcset="demos/generate@2x.avif">
+<source type="image/avif" srcset="demos/generate.avif">
+<img src="demos/generate.gif" alt="Generate sets, style folks.">
 </picture>
 </a>
 </td>
 <td width="50%">
-<h3>Shuffle, or restyle</h3>
+<h3>Generate sets, style folks.</h3>
+<p>Generate a whole set from a description, using Chrome's default model.</p>
 </td>
 </tr>
 <tr valign="top">
