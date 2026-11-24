@@ -342,6 +342,15 @@ grid.addEventListener('dblclick', (e) => {
     if (e.target.classList.contains('role-label')) checkEditTrigger();
 });
 
+// --- About dialog ---------------------------------------------------------
+const aboutDialog = document.getElementById('aboutDialog');
+if (aboutDialog) {   // absent in a cached older index.html
+    document.getElementById('aboutBtn').onclick = () => aboutDialog.showModal();
+    document.getElementById('aboutClose').onclick = () => aboutDialog.close();
+    // the sheet fills the dialog, so a click on the dialog itself is on the backdrop
+    aboutDialog.addEventListener('click', (e) => { if (e.target === aboutDialog) aboutDialog.close(); });
+}
+
 // --- Animation pause ------------------------------------------------------
 function toggleAnimation() {
     state.isPaused = !state.isPaused;
@@ -354,6 +363,12 @@ document.getElementById('pauseBtn').onclick = toggleAnimation;
 document.addEventListener('keydown', (e) => {
     const tag = e.target.tagName.toLowerCase();
     const isInput = tag === 'input' || tag === 'textarea' || tag === 'select' || e.target.isContentEditable;
+    if (aboutDialog?.open) return;   // its keys are its own: Space presses its buttons, Esc closes it
+    if (e.key === '?' && !isInput && aboutDialog) {
+        e.preventDefault();
+        aboutDialog.showModal();
+        return;
+    }
     if (e.code === 'Space' && !isInput) {
         e.preventDefault();
         toggleAnimation();
